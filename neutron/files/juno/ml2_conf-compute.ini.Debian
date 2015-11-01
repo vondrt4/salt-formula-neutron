@@ -1,10 +1,10 @@
-{%- set neutron = pillar.neutron.switch %}
+{%- set neutron = pillar.neutron.compute %}
 [ml2]
 {%- if neutron.tunnel_type == 'gre' or neutron.tunnel_type == 'vxlan' %}
 
 type_drivers = gre
 tenant_network_types = gre
-mechanism_drivers = openvswitch
+mechanism_drivers = openvswitch{%- if neutron.distributed %},l2population{%- endif %}
 [ml2_type_flat]
 [ml2_type_vlan]
 [ml2_type_gre]
@@ -15,7 +15,7 @@ tunnel_id_ranges = 1:1000
 firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 enable_security_group = True
 [ovs]
-local_ip = {{ pillar.neutron.switch.bind.address }}
+local_ip = {{ pillar.neutron.compute.bind.address }}
 tenant_network_type = gre
 tunnel_id_ranges = 1:1000
 enable_tunneling = True
@@ -25,7 +25,7 @@ tunnel_bridge = br-tun
 tunnel_types = gre
 root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 [database]
-connection = {{ pillar.neutron.switch.database.engine }}://{{ pillar.neutron.switch.database.user }}:{{ pillar.neutron.switch.database.password }}@{{ pillar.neutron.switch.database.host }}/{{ pillar.neutron.switch.database.name }}
+connection = {{ pillar.neutron.compute.database.engine }}://{{ pillar.neutron.compute.database.user }}:{{ pillar.neutron.compute.database.password }}@{{ pillar.neutron.compute.database.host }}/{{ pillar.neutron.compute.database.name }}
 
 {%- else %}
 
@@ -42,7 +42,7 @@ firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewal
 
 [ovs]
 enable_tunneling = False
-local_ip = {{ pillar.neutron.switch.bind.address }}
+local_ip = {{ pillar.neutron.compute.bind.address }}
 network_vlan_ranges = physnet1
 bridge_mappings = physnet1:br-net
 

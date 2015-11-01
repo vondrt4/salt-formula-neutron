@@ -1,19 +1,19 @@
 [DEFAULT]
-{%- set metadata = pillar.neutron.bridge.metadata %}
+{%- set metadata = pillar.neutron.network.metadata %}
 # Show debugging output in log (sets DEBUG log level output)
 # debug = True
 debug = False
 
 # The Neutron user information for accessing the Neutron API.
-auth_url = http://{{ pillar.neutron.bridge.identity.host }}:5000/v2.0
-auth_region = {{ pillar.neutron.bridge.identity.get('region', 'RegionOne') }}
+auth_url = http://{{ pillar.neutron.network.identity.host }}:5000/v2.0
+auth_region = {{ pillar.neutron.network.identity.get('region', 'RegionOne') }}
 # Turn off verification of the certificate for ssl
 # auth_insecure = False
 # Certificate Authority public key (CA cert) file for ssl
 # auth_ca_cert =
-admin_tenant_name = {{ pillar.neutron.bridge.identity.tenant }}
-admin_user = {{ pillar.neutron.bridge.identity.user }}
-admin_password = {{ pillar.neutron.bridge.identity.password }}
+admin_tenant_name = {{ pillar.neutron.network.identity.tenant }}
+admin_user = {{ pillar.neutron.network.identity.user }}
+admin_password = {{ pillar.neutron.network.identity.password }}
 
 # Network service endpoint type to pull from the keystone catalog
 # endpoint_type = adminURL

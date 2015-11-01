@@ -8,6 +8,10 @@ lock_path = $state_path/lock
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
 allow_overlapping_ips = True
 
+{%- if neutron.distributed %}
+router_distributed = True
+{%- endif %}
+
 auth_strategy = keystone
 
 bind_host = {{ server.bind.address }}

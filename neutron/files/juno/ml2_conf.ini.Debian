@@ -3,7 +3,7 @@
 {%- if neutron.tunnel_type == 'gre' or neutron.tunnel_type == 'vxlan' %}
 type_drivers = gre
 tenant_network_types = gre
-mechanism_drivers = openvswitch
+mechanism_drivers = openvswitch{%- if neutron.distributed %},l2population{%- endif %}
 
 [ml2_type_flat]
 

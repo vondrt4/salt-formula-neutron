@@ -11,9 +11,7 @@ neutron_compute_packages:
 
 /etc/neutron/neutron.conf:
   file.managed:
-/etc/neutron/neutron.conf:
-  file.managed:
-  - source: salt://neutron/files/{{ compute.version }}/neutron-generic.conf.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ compute.version }}/neutron-compute.conf.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_compute_packages

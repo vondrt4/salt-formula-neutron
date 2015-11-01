@@ -1,18 +1,23 @@
-{%- from "neutron/map.jinja" import switch with context %}
+{%- from "neutron/map.jinja" import compute with context %}
 [DEFAULT]
 verbose = True
 debug = True
 agent_down_time = 75
 lock_path = $state_path/lock
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
+
+{%- if neutron.distributed %}
+router_distributed = True
+{%- endif %}
+
 auth_strategy = keystone
 
 #RabbitMQ
-rabbit_host = {{ switch.message_queue.host }}
-rabbit_port = {{ switch.message_queue.port }}
-rabbit_userid = {{ switch.message_queue.user }}
-rabbit_password = {{ switch.message_queue.password }}
-rabbit_virtual_host = {{ switch.message_queue.virtual_host }}
+rabbit_host = {{ compute.message_queue.host }}
+rabbit_port = {{ compute.message_queue.port }}
+rabbit_userid = {{ compute.message_queue.user }}
+rabbit_password = {{ compute.message_queue.password }}
+rabbit_virtual_host = {{ compute.message_queue.virtual_host }}
 
 notify_nova_on_port_status_changes = True
 notify_nova_on_port_data_changes = True
@@ -35,16 +40,16 @@ report_interval = 5
 
 [keystone_authtoken]
 signing_dir = $state_path/keystone-signing
-auth_uri=http://{{ switch.identity.host }}:5000
-auth_host = {{ switch.identity.host }}
-auth_port = {{ switch.identity.port }}
+auth_uri=http://{{ compute.identity.host }}:5000
+auth_host = {{ compute.identity.host }}
+auth_port = {{ compute.identity.port }}
 auth_protocol = http
-admin_tenant_name = {{ switch.identity.tenant }}
-admin_user = {{ switch.identity.user }}
-admin_password = {{ switch.identity.password }}
+admin_tenant_name = {{ compute.identity.tenant }}
+admin_user = {{ compute.identity.user }}
+admin_password = {{ compute.identity.password }}
 
 [database]
-connection = {{ switch.database.engine }}://{{ switch.database.user }}:{{ switch.database.password }}@{{ switch.database.host }}/{{ switch.database.name }}
+connection = {{ compute.database.engine }}://{{ compute.database.user }}:{{ compute.database.password }}@{{ compute.database.host }}/{{ compute.database.name }}
 
 [service_providers]
 service_provider=VPN:openswan:neutron.services.vpn.service_drivers.ipsec.IPsecVPNDriver:default

@@ -25,40 +25,14 @@ neutron_network_precise_packages:
 
 /etc/neutron/neutron.conf:
   file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/neutron-network.conf
+  - source: salt://neutron/files/{{ network.version }}/neutron-network.conf
   - template: jinja
   - require:
     - pkg: neutron_network_packages
-
-{%- endif %}
-
-{% if network.tunnel_type != 'flat' %}
-/etc/neutron/plugins/openvswitch:
-  file.directory:
-  - mode: 755
-  - makedirs: true
-  - user: neutron
-  - group: neutron
-
-/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini:
-  file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/ovs_neutron_plugin.ini.{{ grains.os_family }}
-  - template: jinja
-  - require:
-    - pkg: neutron_network_packages
-    - file: /etc/neutron/plugins/openvswitch
-
-/etc/neutron/l3_agent.ini:
-  file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/l3_agent.ini.{{ grains.os_family }}
-  - template: jinja
-  - require:
-    - pkg: neutron_network_packages
-{% endif %}
 
 /etc/neutron/plugins/ml2/ml2_conf.ini:
   file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/ml2_conf.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ network.version }}/ml2_conf.ini.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_network_packages
@@ -69,23 +43,52 @@ neutron_network_precise_packages:
     - require:
       - file: /etc/neutron/plugins/ml2/ml2_conf.ini
 
+{%- endif %}
+
+{% if network.tunnel_type != 'flat' %}
+
+{# vondrt4: This is likely obsolete since Havana
+/etc/neutron/plugins/openvswitch:
+  file.directory:
+  - mode: 755
+  - makedirs: true
+  - user: neutron
+  - group: neutron
+
+/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ network.version }}/ovs_neutron_plugin.ini.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_network_packages
+    - file: /etc/neutron/plugins/openvswitch
+#}
+
+/etc/neutron/l3_agent.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ network.version }}/l3_agent.ini.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_network_packages
+{% endif %}
+
 /etc/neutron/dhcp_agent.ini:
   file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/dhcp_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ network.version }}/dhcp_agent.ini.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_network_packages
 
 /etc/neutron/metadata_agent.ini:
   file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/metadata_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ network.version }}/metadata_agent.ini.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_network_packages
 
 /etc/neutron/dnsmasq-neutron.conf:
   file.managed:
-  - source: salt://neutron/conf/{{ network.version }}/dnsmasq-neutron.conf
+  - source: salt://neutron/files/{{ network.version }}/dnsmasq-neutron.conf
   - template: jinja
   - require:
     - pkg: neutron_network_packages
@@ -119,6 +122,7 @@ neutron_network_services:
 
 {% endif %}
 
+{# vondrt4: This is likely obsolete since Icehouse
 {% if network.migration %}
 
 fuel_packages:
@@ -136,7 +140,7 @@ python-ecdsa:
 
 /usr/bin/q-agent-cleanup.py:
   file.managed:
-  - source: salt://neutron/conf/q-agent-cleanup.py
+  - source: salt://neutron/files/q-agent-cleanup.py
   - template: jinja
   - mode: 755
   - user: root
@@ -148,7 +152,7 @@ python-ecdsa:
 
 /root/.ssh/id_rsa_neutron:
   file.managed:
-  - source: salt://neutron/conf/id_rsa
+  - source: salt://neutron/files/id_rsa
   - contents_pillar: private_keys:neutron:key
   - user: root
   - group: root
@@ -156,7 +160,7 @@ python-ecdsa:
 
 /root/.ssh/id_rsa_neutron.pub:
   file.managed:
-  - source: salt://neutron/conf/id_rsa.pub
+  - source: salt://neutron/files/id_rsa.pub
   - contents_pillar: public_keys:neutron:key
   - user: root
   - group: root
@@ -172,7 +176,7 @@ neutron_root_auth_key:
 
 /root/.ssh/id_rsa_neutron:
   file.managed:
-  - source: salt://neutron/conf/id_rsa
+  - source: salt://neutron/files/id_rsa
   - template: jinja
   - user: root
   - group: root
@@ -180,7 +184,7 @@ neutron_root_auth_key:
 
 /root/.ssh/id_rsa_neutron.pub:
   file.managed:
-  - source: salt://neutron/conf/id_rsa.pub
+  - source: salt://neutron/files/id_rsa.pub
   - template: jinja
   - user: root
   - group: root
@@ -199,6 +203,8 @@ neutron_root_auth_key:
 {%- endif %}
 
 {% endif %}
+
+#}
 
 gro_disabled:
   cmd.run:

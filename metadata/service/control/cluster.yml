@@ -36,6 +36,7 @@ parameters:
         user: openstack
         password: ${_param:rabbitmq_openstack_password}
         virtual_host: '/openstack'
+        ha_queues: true
       compute:
         host: ${_param:cluster_vip_address}
         region: RegionOne

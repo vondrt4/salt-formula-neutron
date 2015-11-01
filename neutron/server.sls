@@ -41,6 +41,10 @@ neutron_server_service:
 
 {% if server.backend.engine == "ml2" %}
 
+neutron_server_ml2_package:
+  pkg.installed:
+  - names: {{ server.pkgs_ml2 }}
+
 /etc/neutron/plugins/ml2/ml2_conf.ini:
   file.managed:
   - source: salt://neutron/files/{{ server.version }}/ml2_conf.ini

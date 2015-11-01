@@ -1,10 +1,16 @@
 {% from "neutron/map.jinja" import compute with context %}
 {%- if compute.enabled %}
 
+net.ipv4.ip_forward:
+  sysctl.present:
+    - value: 1
+
 neutron_compute_packages:
   pkg.installed:
   - names: {{ compute.pkgs }}
 
+/etc/neutron/neutron.conf:
+  file.managed:
 /etc/neutron/neutron.conf:
   file.managed:
   - source: salt://neutron/files/{{ compute.version }}/neutron-generic.conf.{{ grains.os_family }}

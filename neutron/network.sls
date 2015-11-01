@@ -47,7 +47,6 @@ neutron_network_precise_packages:
 
 {% if network.tunnel_type != 'flat' %}
 
-{# vondrt4: This is likely obsolete since Havana
 /etc/neutron/plugins/openvswitch:
   file.directory:
   - mode: 755
@@ -62,7 +61,6 @@ neutron_network_precise_packages:
   - require:
     - pkg: neutron_network_packages
     - file: /etc/neutron/plugins/openvswitch
-#}
 
 /etc/neutron/l3_agent.ini:
   file.managed:

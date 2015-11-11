@@ -25,7 +25,7 @@ notify_nova_on_port_data_changes = True
 #Nova
 nova_url = http://{{ pillar.nova.compute.identity.host }}:8774/v2
 nova_admin_username ={{ pillar.nova.compute.identity.user }}
-nova_admin_tenant_id = {{ pillar.nova.compute.identity.tenant_id }}
+nova_admin_tenant_name = {{ pillar.nova.compute.identity.tenant }}
 nova_admin_password ={{ pillar.nova.compute.identity.password }}
 nova_admin_auth_url =http://{{ pillar.nova.compute.identity.host }}:{{ pillar.nova.compute.identity.port }}/v2.0
 

@@ -8,7 +8,7 @@ lock_path = $state_path/lock
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
 allow_overlapping_ips = True
 
-{%- if neutron.distributed %}
+{%- if pillar.neutron.server.distributed %}
 router_distributed = True
 {%- endif %}
 
@@ -32,7 +32,7 @@ notify_nova_on_port_data_changes = True
 #Nova parameters
 nova_url = http://{{ pillar.nova.controller.identity.host }}:8774/v2
 nova_admin_username ={{ pillar.nova.controller.identity.user }}
-nova_admin_tenant_id = {{ pillar.nova.controller.identity.tenant_id }}
+nova_admin_tenant_name = {{ pillar.nova.controller.identity.tenant }}
 nova_admin_password ={{ pillar.nova.controller.identity.password }}
 nova_admin_auth_url =http://{{ pillar.nova.controller.identity.host }}:{{ pillar.nova.controller.identity.port }}/v2.0
 

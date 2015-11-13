@@ -22,7 +22,7 @@ metadata_ip=169.254.169.254
 metadata_port=8775
 root_helper=sudo neutron-rootwrap /etc/neutron/rootwrap.conf
 {%- if neutron.distributed %}
-{%- if pillar.neutron..network is defined %}
+{%- if pillar.neutron.network is defined %}
 agent_mode = dvr_snat
 {%- elif pillar.neutron.compute is defined %}
 agent_mode = dvr

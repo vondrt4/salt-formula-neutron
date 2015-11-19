@@ -14,7 +14,6 @@ external_network_bridge = br-ex
 use_namespaces = True
 enable_isolated_metadata = True
 enable_metadata_network = True
-root_helper=sudo neutron-rootwrap /etc/neutron/rootwrap.conf
 state_path=/var/lib/neutron
 dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
 admin_user = {{ neutron.identity.user }}
@@ -23,3 +22,5 @@ signing_dir=/var/lib/neutron/keystone-signing
 admin_tenant_name = {{ neutron.identity.tenant }}
 auth_url=http://{{ neutron.identity.host }}:{{ neutron.identity.port }}/v2.0
 verbose=true
+[AGENT]
+root_helper=sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf

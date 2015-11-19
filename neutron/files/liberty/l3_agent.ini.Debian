@@ -20,7 +20,7 @@ auth_url=http://{{ neutron.identity.host }}:{{ neutron.identity.port }}/v2.0
 verbose=true
 metadata_ip=169.254.169.254
 metadata_port=8775
-root_helper=sudo neutron-rootwrap /etc/neutron/rootwrap.conf
+
 {%- if neutron.distributed %}
 {%- if pillar.neutron.network is defined %}
 agent_mode = dvr_snat
@@ -28,3 +28,5 @@ agent_mode = dvr_snat
 agent_mode = dvr
 {%- endif %}
 {%- endif %}
+[AGENT]
+root_helper=sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf

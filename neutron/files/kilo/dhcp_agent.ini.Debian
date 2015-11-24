@@ -12,6 +12,7 @@ interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
 dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
 external_network_bridge = br-ex
 use_namespaces = True
+dhcp_delete_namespaces = True
 enable_isolated_metadata = True
 enable_metadata_network = True
 state_path=/var/lib/neutron

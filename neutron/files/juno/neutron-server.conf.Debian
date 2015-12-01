@@ -1,12 +1,12 @@
 {%- from "neutron/map.jinja" import server with context %}
 [DEFAULT]
-[DEFAULT]
 verbose = True
 debug = True
 agent_down_time = 75
 lock_path = $state_path/lock
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
 allow_overlapping_ips = True
+allow_automatic_l3agent_failover = True
 
 {%- if pillar.neutron.server.distributed %}
 router_distributed = True

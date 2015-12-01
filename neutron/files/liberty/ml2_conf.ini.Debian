@@ -32,7 +32,7 @@ tunnel_bridge = br-tun
 bridge_mappings = external:br-ex
 
 [agent]
-tunnel_types = gre
+tunnel_types = {{ neutron.tunnel_type }}
 root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 
 [database]

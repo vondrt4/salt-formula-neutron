@@ -45,6 +45,27 @@ service_plugins = router
 
 [quotas]
 
+# resource name(s) that are supported in quota features
+quota_items = network,subnet,port
+
+# number of networks allowed per tenant, and minus means unlimited
+quota_network = 5
+
+# number of subnets allowed per tenant, and minus means unlimited
+quota_subnet = 5
+
+# number of ports allowed per tenant, and minus means unlimited
+quota_port = 20
+
+# default driver to use for quota checks
+quota_driver = neutron.quota.ConfDriver
+
+# number of routers allowed per tenant, and minus means unlimited
+quota_router = 5
+
+# number of floating IPs allowed per tenant, and minus means unlimited
+quota_floatingip = 1
+
 [agent]
 report_interval = 5
 

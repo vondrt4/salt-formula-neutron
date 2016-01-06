@@ -724,7 +724,7 @@ quota_subnet = 5
 quota_port = 20
 
 # default driver to use for quota checks
-quota_driver = neutron.quota.ConfDriver
+quota_driver = neutron.db.quota_db.DbQuotaDriver
 
 # number of routers allowed per tenant, and minus means unlimited
 quota_router = 5

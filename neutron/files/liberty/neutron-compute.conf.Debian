@@ -37,6 +37,8 @@ service_plugins = router
 
 [agent]
 report_interval = 5
+root_helper=sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
+
 
 [keystone_authtoken]
 signing_dir = $state_path/keystone-signing

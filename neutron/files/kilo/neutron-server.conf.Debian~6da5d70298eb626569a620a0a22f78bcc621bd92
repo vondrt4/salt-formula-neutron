@@ -68,6 +68,8 @@ quota_floatingip = 1
 
 [agent]
 report_interval = 5
+root_helper=sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
+
 
 [keystone_authtoken]
 auth_host = {{ server.identity.host }}

@@ -34,6 +34,10 @@ bridge_mappings = external:br-ex
 
 [agent]
 tunnel_types = {{ neutron.tunnel_type }}
+{% if neutron.distributed %}
+l2_population = True
+enable_distributed_routing = True
+{%- endif %}
 root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 
 [database]

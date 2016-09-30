@@ -1,7 +1,7 @@
 {%- from "neutron/map.jinja" import compute with context %}
 [DEFAULT]
 verbose = True
-debug = True
+debug = False
 agent_down_time = 75
 lock_path = $state_path/lock
 notification_driver = neutron.openstack.common.notifier.rpc_notifier

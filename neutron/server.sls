@@ -1,5 +1,5 @@
 {%- from "neutron/map.jinja" import server with context %}
-{%- if server.enabled %}
+{%- if server.get('enabled', False) %}
 
 neutron_server_packages:
   pkg.installed:

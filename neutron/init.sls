@@ -9,3 +9,6 @@ include:
 {% if pillar.neutron.compute is defined %}
 - neutron.compute
 {% endif %}
+{% if pillar.neutron.client is defined %}
+- neutron.client
+{% endif %}

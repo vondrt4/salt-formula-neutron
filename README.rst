@@ -589,6 +589,101 @@ Enable auditing filter, ie: CADF
       ....
 
 
+Client role
+-----------
+
+Neutron networks
+
+.. code-block:: yaml
+
+    neutron:
+      client:
+        enabled: true
+        server:
+          identity:
+            network:
+              inet1:
+                shared: False
+                admin_state_up: True
+                router_external: True
+                provider_physical_network: inet
+                provider_network_type: flat
+                provider_segmentation_id: 2
+                subnet:
+                  inet1-subnet1:
+                    cidr: 192.168.90.0/24
+                    enable_dhcp: False
+              inet2:
+                shared: False
+                router_external: True
+                provider_network_type: "vlan"
+                subnet:
+                  inet2-subnet1:
+                    cidr: 192.168.92.0/24
+                    enable_dhcp: False
+                  inet2-subnet2:
+                    cidr: 192.168.94.0/24
+                    enable_dhcp: True
+          identity1:
+            network:
+              ...
+
+
+Neutron routers
+
+.. code-block:: yaml
+
+    neutron:
+      client:
+        enabled: true
+        server:
+          identity:
+            router:
+              inet1-router:
+                admin_state_up: True
+                gateway_network: inet
+                interfaces:
+                  - inet1-subnet1
+                  - inet1-subnet2
+          identity1:
+            router:
+              ...
+
+    TODO: implement adding new interfaces to a router while updating it
+
+
+Neutron security groups
+
+.. code-block:: yaml
+
+    neutron:
+      client:
+        enabled: true
+        server:
+          identity:
+            security_group:
+              security_group1:
+                 description: security group 1
+                 rules:
+                   - direction: ingress
+                     ethertype: IPv4
+                     protocol: TCP
+                     port_range_min: 1
+                     port_range_max: 65535
+                     remote_ip_prefix: 0.0.0.0/0
+                   - direction: ingress
+                     ethertype: IPv4
+                     protocol: UDP
+                     port_range_min: 1
+                     port_range_max: 65535
+                     remote_ip_prefix: 0.0.0.0/0
+                   - direction: ingress
+                     protocol: ICMP
+                     remote_ip_prefix: 0.0.0.0/0
+          identity1:
+            security_group:
+              ...
+
 Usage
 =====
 

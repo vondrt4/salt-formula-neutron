@@ -48,6 +48,15 @@
     },
 }, merge=pillar.neutron.get('server', {})) %}
 
+{% set client = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ['python-neutronclient']
+    },
+    'RedHat': {
+        'pkgs': ['python-neutronclient']
+    },
+}, merge=pillar.neutron.get('client', {})) %}
+
 {%- if pillar.neutron.server is defined %}
 
 {%- set tmp_server = pillar.neutron.server %}

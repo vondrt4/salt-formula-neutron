@@ -589,101 +589,6 @@ Enable auditing filter, ie: CADF
       ....
 
 
-Client role
------------
-
-Neutron networks
-
-.. code-block:: yaml
-
-    neutron:
-      client:
-        enabled: true
-        server:
-          identity:
-            network:
-              inet1:
-                shared: False
-                admin_state_up: True
-                router_external: True
-                provider_physical_network: inet
-                provider_network_type: flat
-                provider_segmentation_id: 2
-                subnet:
-                  inet1-subnet1:
-                    cidr: 192.168.90.0/24
-                    enable_dhcp: False
-              inet2:
-                shared: False
-                router_external: True
-                provider_network_type: "vlan"
-                subnet:
-                  inet2-subnet1:
-                    cidr: 192.168.92.0/24
-                    enable_dhcp: False
-                  inet2-subnet2:
-                    cidr: 192.168.94.0/24
-                    enable_dhcp: True
-          identity1:
-            network:
-              ...
-
-
-Neutron routers
-
-.. code-block:: yaml
-
-    neutron:
-      client:
-        enabled: true
-        server:
-          identity:
-            router:
-              inet1-router:
-                admin_state_up: True
-                gateway_network: inet
-                interfaces:
-                  - inet1-subnet1
-                  - inet1-subnet2
-          identity1:
-            router:
-              ...
-
-    TODO: implement adding new interfaces to a router while updating it
-
-
-Neutron security groups
-
-.. code-block:: yaml
-
-    neutron:
-      client:
-        enabled: true
-        server:
-          identity:
-            security_group:
-              security_group1:
-                 description: security group 1
-                 rules:
-                   - direction: ingress
-                     ethertype: IPv4
-                     protocol: TCP
-                     port_range_min: 1
-                     port_range_max: 65535
-                     remote_ip_prefix: 0.0.0.0/0
-                   - direction: ingress
-                     ethertype: IPv4
-                     protocol: UDP
-                     port_range_min: 1
-                     port_range_max: 65535
-                     remote_ip_prefix: 0.0.0.0/0
-                   - direction: ingress
-                     protocol: ICMP
-                     remote_ip_prefix: 0.0.0.0/0
-          identity1:
-            security_group:
-              ...
-
 Usage
 =====
 
@@ -718,3 +623,36 @@ repository at:
 Developers should also join the discussion on the IRC list, at:
 
     https://wiki.openstack.org/wiki/Meetings/openstack-salt
+
+Documentation and Bugs
+======================
+
+To learn how to install and update salt-formulas, consult the documentation
+available online at:
+
+    http://salt-formulas.readthedocs.io/
+
+In the unfortunate event that bugs are discovered, they should be reported to
+the appropriate issue tracker. Use Github issue tracker for specific salt
+formula:
+
+    https://github.com/salt-formulas/salt-formula-neutron/issues
+
+For feature requests, bug reports or blueprints affecting entire ecosystem,
+use Launchpad salt-formulas project:
+
+    https://launchpad.net/salt-formulas
+
+You can also join salt-formulas-users team and subscribe to mailing list:
+
+    https://launchpad.net/~salt-formulas-users
+
+Developers wishing to work on the salt-formulas projects should always base
+their work on master branch and submit pull request against specific formula.
+
+    https://github.com/salt-formulas/salt-formula-neutron
+
+Any questions or feedback is always welcome so feel free to join our IRC
+channel:
+
+    #salt-formulas @ irc.freenode.net

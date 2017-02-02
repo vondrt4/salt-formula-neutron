@@ -62,14 +62,18 @@ mac_generation_retries = 32
 #allow_bulk = true
 
 # Allow the usage of the pagination (boolean value)
-#allow_pagination = false
+{% if server.get('allow_pagination', false) %}
+allow_pagination = True
+{% else %}
+allow_pagination = False
+{% endif %}
 
 # Allow the usage of the sorting (boolean value)
 #allow_sorting = false
 
 # The maximum number of items returned in a single response, value was
 # 'infinite' or negative integer means no limit (string value)
-#pagination_max_limit = -1
+pagination_max_limit = {{ server.pagination_max_limit|default('-1') }}
 
 # Default value of availability zone hints. The availability zone aware
 # schedulers use this when the resources availability_zone_hints is empty.

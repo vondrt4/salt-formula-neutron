@@ -137,7 +137,11 @@ dns_domain = {{ neutron.dns_domain }}
 # Enable or disable bulk create/update/delete operations
 # allow_bulk = True
 # Enable or disable pagination
-# allow_pagination = False
+{% if server.get('allow_pagination', false) %}
+allow_pagination = True
+{% else %}
+allow_pagination = False
+{% endif %}
 # Enable or disable sorting
 # allow_sorting = False
 # Enable or disable overlapping IPs for subnets
@@ -155,7 +159,7 @@ allow_overlapping_ips = True
 # be greater than 0. If the number of items requested is greater than
 # pagination_max_limit, server will just return pagination_max_limit
 # of number of items.
-# pagination_max_limit = -1
+pagination_max_limit = {{ server.pagination_max_limit|default('-1') }}
 
 # Maximum number of DNS nameservers per subnet
 # max_dns_nameservers = 5

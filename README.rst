@@ -21,6 +21,8 @@ Neutron Server on the controller node
       server:
         enabled: true
         version: mitaka
+        allow_pagination: true
+        pagination_max_limit: 100
         bind:
           address: 172.20.0.1
           port: 9696
@@ -51,6 +53,11 @@ Neutron Server on the controller node
           password: pass
         audit:
           enabled: false
+
+Note: The pagination is useful to retrieve a large bunch of resources,
+because a single request may fail (timeout). This is enabled with both
+parameters *allow_pagination* and *pagination_max_limit* as shown above.
+
 
 Neutron VXLAN tenant networks with Network Nodes (with DVR for East-West
  and Network node for North-South)

@@ -14,6 +14,7 @@ neutron_openstack_network_{{ network_name }}:
   neutronng.network_present:
     - name: {{ network_name }}
     - profile: {{ identity_name }}
+    - tenant: {{ network.tenant }}
 
     {%- if network.provider_network_type is defined %}
     - provider_network_type: {{ network.provider_network_type }}
@@ -40,6 +41,7 @@ neutron_openstack_subnet_{{ subnet_name }}:
     - name: {{ subnet_name }}
     - network: {{ network_name }}
     - profile: {{ identity_name }}
+    - tenant: {{ network.tenant }}
 
     {%- if subnet.cidr is defined %}
     - cidr: {{ subnet.cidr  }}
@@ -75,6 +77,8 @@ neutron_openstack_router_{{ router_name }}:
     - interfaces: {{ router.interfaces }}
     - gateway_network: {{ router.gateway_network }}
     - profile: {{ identity_name }}
+    - tenant: {{ router.tenant }}
+    - admin_state_up: {{ router.admin_state_up }}
 {%- endfor %}
 
 {%- for security_group_name, security_group in identity.security_group.iteritems() %}
@@ -84,6 +88,7 @@ openstack_security_group_{{ security_group_name }}:
     - description: {{ security_group.description }}
     - rules: {{ security_group.rules }}
     - profile: {{ identity_name }}
+    - tenant: {{ security_group.tenant }}
 {%- endfor %}
 
 {%- endfor %}

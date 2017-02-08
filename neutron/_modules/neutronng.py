@@ -3,6 +3,7 @@
 import logging
 from functools import wraps
 LOG = logging.getLogger(__name__)
+
 # Import third party libs
 HAS_NEUTRON = False
 try:

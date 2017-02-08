@@ -64,6 +64,7 @@ def _auth(profile=None):
 
 @_test_call
 def network_present(name=None,
+                    tenant=None,
                     provider_network_type=None,
                     provider_physical_network=None,
                     router_external=None,
@@ -76,18 +77,15 @@ def network_present(name=None,
     name
         The name of the network to manage
     '''
-    #for p in connection_args: print p
+    tenant_name = tenant
     connection_args = _auth(profile)
-    print connection_args
-    for p in connection_args: print p
-    print("neco")
-    print provider_network_type
-    print name
-    print provider_physical_network
-    print router_external
-    print admin_state_up
-    print shared
-    print provider_segmentation_id
+    try:
+        tenant_id = __salt__['keystone.tenant_get'](
+            name=tenant_name, **connection_args)[tenant_name]['id']
+    except:
+        tenant_id = None
+        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
+            connection_args['connection_user']))
     existing_network = _neutron_module_call(
         'list_networks', name=name, **connection_args)
     network_arguments = _get_non_null_args(
@@ -97,8 +95,9 @@ def network_present(name=None,
         router_external=router_external,
         admin_state_up=admin_state_up,
         shared=shared,
+        tenant_id=tenant_id,
         provider_segmentation_id=provider_segmentation_id)
-    #for p in network_arguments: print p
+
     if not existing_network:
         network_arguments.update(connection_args)
         _neutron_module_call('create_network', **network_arguments)
@@ -107,8 +106,7 @@ def network_present(name=None,
         if existing_network:
             return _created(name, 'network', existing_network[name])
         return _update_failed(name, 'network')
-    # map internal representation to display format
-    #for p in connection_args: print p
+
     LOG.info('CONNECTION STRINGS' + str(connection_args))
     LOG.info('existing ' + str(existing_network))
     LOG.info('new ' + str(network_arguments))
@@ -153,6 +151,7 @@ def network_absent(name, profile=None):
 
 @_test_call
 def subnet_present(name=None,
+                   tenant=None,
                    network=None,
                    cidr=None,
                    ip_version=4,
@@ -168,9 +167,16 @@ def subnet_present(name=None,
         The name of the subnet to manage
     '''
     connection_args = _auth(profile)
-
+    tenant_name = tenant
+    try:
+        tenant_id = __salt__['keystone.tenant_get'](
+            name=tenant_name, **connection_args)[tenant_name]['id']
+    except:
+        tenant_id = None
+        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
+            connection_args['connection_user']))
     existing_subnet = _neutron_module_call(
-        'list_subnets', name=name, **connection_args)
+        'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
     subnet_arguments = _get_non_null_args(
         name=name,
         network=network,
@@ -185,14 +191,14 @@ def subnet_present(name=None,
     if 'network' in subnet_arguments:
         network = subnet_arguments.pop('network', None)
         existing_network = _neutron_module_call(
-            'list_networks', name=network, **connection_args)
+            'list_networks', tenant_id=tenant_id, name=network, **connection_args)
         if existing_network:
             subnet_arguments['network_id'] = existing_network[network]['id']
     if not existing_subnet:
         subnet_arguments.update(connection_args)
-        _neutron_module_call('create_subnet', **subnet_arguments)
+        _neutron_module_call('create_subnet', tenant_id=tenant_id, **subnet_arguments)
         existing_subnet = _neutron_module_call(
-            'list_subnets', name=name, **connection_args)
+            'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
         if existing_subnet:
             return _created(name, 'subnet', existing_subnet[name])
         return _update_failed(name, 'subnet')
@@ -226,7 +232,7 @@ def subnet_present(name=None,
 def subnet_absent(name, profile=None):
     connection_args = _auth(profile)
     existing_subnet = _neutron_module_call(
-        'list_subnets', name=name, **connection_args)
+        'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
     if existing_subnet:
         _neutron_module_call(
             'delete_subnet', existing_subnet[name]['id'], **connection_args)
@@ -239,9 +245,10 @@ def subnet_absent(name, profile=None):
 
 @_test_call
 def router_present(name=None,
+                   tenant=None,
                    gateway_network=None,
                    interfaces=None,
-                   admin_state_up=None,
+                   admin_state_up=True,
                    profile=None):
     '''
     Ensure that the neutron router is present with the specified properties.
@@ -253,10 +260,18 @@ def router_present(name=None,
         list of subnets the router attaches to
     '''
     connection_args = _auth(profile)
+    tenant_name = tenant
+    try:
+        tenant_id = __salt__['keystone.tenant_get'](
+            name=tenant_name, **connection_args)[tenant_name]['id']
+    except:
+        tenant_id = None
+        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
+            connection_args['connection_user']))
     existing_router = _neutron_module_call(
         'list_routers', name=name, **connection_args)
     if not existing_router:
-        _neutron_module_call('create_router', name=name, **connection_args)
+        _neutron_module_call('create_router', name=name, tenant_id=tenant_id, admin_state_up=admin_state_up, **connection_args)
         created_router = _neutron_module_call(
             'list_routers', name=name, **connection_args)
         if created_router:
@@ -286,7 +301,7 @@ def router_present(name=None,
     router_id = existing_router[name]['id']
     existing_router = existing_router[name]
     diff = {}
-    if admin_state_up and existing_router['admin_state_up'] != admin_state_up:
+    if ( admin_state_up == True or admin_state_up == False ) and existing_router['admin_state_up'] != admin_state_up:
         diff.update({'admin_state_up': admin_state_up})
     if gateway_network:
         network = _neutron_module_call(
@@ -295,8 +310,9 @@ def router_present(name=None,
         if not existing_router['external_gateway_info'] and not existing_router['external_gateway_info'] == None:
             if existing_router['external_gateway_info']['network_id'] != gateway_network_id:
                 diff.update({'external_gateway_info': {'network_id': gateway_network_id}})
-        elif not 'network_id' in existing_router['external_gateway_info'] or existing_router['external_gateway_info']['network_id'] != gateway_network_id:
-            diff.update({'external_gateway_info': {'network_id': gateway_network_id}})
+        elif not existing_router['external_gateway_info'] == None:
+            if not 'network_id' in existing_router['external_gateway_info'] or existing_router['external_gateway_info']['network_id'] != gateway_network_id:
+                diff.update({'external_gateway_info': {'network_id': gateway_network_id}})
     if diff:
         # update the changes
         router_args = diff.copy()
@@ -312,6 +328,7 @@ def router_present(name=None,
     return _no_change(name, 'router')
 
 def security_group_present(name=None,
+                           tenant=None,
                            description=None,
                            rules=[],
                            profile=None):
@@ -324,12 +341,11 @@ def security_group_present(name=None,
     rules
         list of rules to be added to the given security group
     '''
-    #for p in rules: print p
     # If the user is an admin, he's able to see the security groups from
     # other tenants. In this case, we'll use the tenant id to get an existing
     # security group.
     connection_args = _auth(profile)
-    tenant_name = connection_args['connection_tenant']
+    tenant_name = tenant
     try:
         tenant_id = __salt__['keystone.tenant_get'](
             name=tenant_name, **connection_args)[tenant_name]['id']
@@ -350,6 +366,7 @@ def security_group_present(name=None,
         security_group_id = _neutron_module_call('create_security_group',
                                                  name=name,
                                                  description=description,
+                                                 tenant_id=tenant_id,
                                                  **connection_args)
     else:
         security_group_id = security_group[name]['id']
@@ -369,26 +386,17 @@ def security_group_present(name=None,
             if not rule.has_key(attribute):
                 rule[attribute] = rules_attributes_defaults[attribute]
 
-    for rule in rules:
-        for attribute in rules_attributes_defaults.keys():
-            print rule
-            print rule[attribute]
-
     # Remove all the duplicates rules given by the user in pillar.
     unique_rules = []
     for rule in rules:
         if rule not in unique_rules:
             unique_rules.append(rule)
 
-    #for p in unique_rules: print p
-
     # Get the existing security group rules.
     existing_rules = _neutron_module_call(
         'list_security_groups',
         id=security_group_id,
         **connection_args)[name]['security_group_rules']
-
-    #for p in existing_rules: print p
 
     new_rules = {}
     for rule in unique_rules:
@@ -413,13 +421,6 @@ def security_group_present(name=None,
             continue
         rule_index = len(new_rules) + 1
         new_rules.update({'Rule {0}'.format(rule_index): rule})
-        print security_group_id
-        print rule['direction']
-        print rule['ethertype']
-        print rule['protocol']
-        print rule['port_range_min']
-        print rule['port_range_max']
-        print rule['remote_ip_prefix']
         _neutron_module_call('create_security_group_rule',
                              security_group_id=security_group_id,
                              direction=rule['direction'],
@@ -428,15 +429,8 @@ def security_group_present(name=None,
                              port_range_min=rule['port_range_min'],
                              port_range_max=rule['port_range_max'],
                              remote_ip_prefix=rule['remote_ip_prefix'],
+                             tenant_id=tenant_id,
                              **connection_args)
-
-       # print security_group_id
-       # print direction
-       # print ethertype
-       # print protocol
-       # print port_range_min
-       # print port_range_max
-       # print remote_ip_prefix
 
     if not security_group:
         # The security group didn't exist. It was created and specified

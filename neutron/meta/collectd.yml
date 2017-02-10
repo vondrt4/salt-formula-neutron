@@ -15,5 +15,12 @@ remote_plugin:
     username: {{ server.identity.user }}
     password: {{ server.identity.password }}
     tenant: {{ server.identity.tenant }}
+  openstack_neutron_agents:
+    plugin: python
+    template: neutron/files/collectd_openstack_neutron_agents.conf
+    url: "http://{{ server.identity.host }}:{{ server.identity.port }}/v{% if server.identity.get('api_version', 2)|int == 2 %}2.0{% else %}3{% endif %}"
+    username: {{ server.identity.user }}
+    password: {{ server.identity.password }}
+    tenant: {{ server.identity.tenant }}
 {%- endif %}
 {%- endif %}

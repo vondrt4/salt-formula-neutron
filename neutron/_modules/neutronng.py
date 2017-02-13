@@ -278,7 +278,7 @@ def create_floatingip(neutron_interface, **floatingip_params):
     response = neutron_interface.create_floatingip(
         {'floatingip': floatingip_params})
     if 'floatingip' in response and 'id' in response['floatingip']:
-        return response['floatingip']['id']
+        return response
 
 
 @_autheticate

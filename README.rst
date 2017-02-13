@@ -697,6 +697,29 @@ Neutron security groups
 
     TODO: implement updating existing security rules (now it adds new rule if trying to update existing one)
 
+
+Floating IP addresses
+
+.. code-block:: yaml
+
+    neutron:
+      client:
+        enabled: true
+        server:
+          identity:
+            floating_ip:
+              prx01-instance:
+                server: prx01.mk22-lab-basic.local
+                subnet: private-subnet1
+                network: public-net1
+                tenant: demo
+              gtw01-instance:
+                ...
+
+.. note:: The network must have flag router:external set to True.
+          Instance port in the stated subnet will be associated with the dynamically generated floating IP.
+
+
 Usage
 =====
 

@@ -8,6 +8,8 @@ neutron_client_packages:
 
 {%- for identity_name, identity in client.server.iteritems() %}
 
+{%- if identity.network is defined %}
+
 {%- for network_name, network in identity.network.iteritems() %}
 
 neutron_openstack_network_{{ network_name }}:
@@ -34,6 +36,8 @@ neutron_openstack_network_{{ network_name }}:
     {%- if network.provider_segmentation_id is defined %}
     - provider_segmentation_id: {{ network.provider_segmentation_id }}
     {%- endif %}
+
+{%- if network.subnet is defined %}
 
 {%- for subnet_name, subnet in network.subnet.iteritems() %}
 neutron_openstack_subnet_{{ subnet_name }}:
@@ -68,7 +72,14 @@ neutron_openstack_subnet_{{ subnet_name }}:
       - neutronng: neutron_openstack_network_{{ network_name }}
 
 {%- endfor %}
+
+{%- endif %}
+
 {%- endfor %}
+
+{%- endif %}
+
+{%- if identity.router is defined %}
 
 {%- for router_name, router in identity.router.iteritems() %}
 neutron_openstack_router_{{ router_name }}:
@@ -81,6 +92,10 @@ neutron_openstack_router_{{ router_name }}:
     - admin_state_up: {{ router.admin_state_up }}
 {%- endfor %}
 
+{%- endif %}
+
+{%- if identity.security_group is defined %}
+
 {%- for security_group_name, security_group in identity.security_group.iteritems() %}
 openstack_security_group_{{ security_group_name }}:
   neutronng.security_group_present:
@@ -90,6 +105,23 @@ openstack_security_group_{{ security_group_name }}:
     - profile: {{ identity_name }}
     - tenant: {{ security_group.tenant }}
 {%- endfor %}
+
+{%- endif %}
+
+{%- if identity.floating_ip is defined %}
+
+{%- for instance_name, instance in identity.floating_ip.iteritems() %}
+neutron_floating_ip_for_{{ instance_name }}:
+  neutronng.floatingip_present:
+    - subnet: {{ instance.subnet }}
+    - tenant_name: {{ instance.tenant }}
+    - name: {{ instance.server }}
+    - network:  {{ instance.network }}
+    - profile: {{ identity_name }}
+
+{%- endfor %}
+
+{%- endif %}
 
 {%- endfor %}
 

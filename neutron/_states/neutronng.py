@@ -327,6 +327,62 @@ def router_present(name=None,
             return _update_failed(name, 'router')
     return _no_change(name, 'router')
 
+
+def floatingip_present(name=None,
+                       tenant_name=None,
+                       subnet=None,
+                       tenant=None,
+                       network=None,
+                       port_id=None,
+                       fip_exists=False,
+                       profile=None):
+    '''
+    Ensure that the floating ip address is present for an instance
+    '''
+    instance_id = __salt__['novang.server_get'](name=name, tenant_name=tenant_name, profile=profile)
+    subnet_name = subnet
+    connection_args = _auth(profile)
+    existing_subnet = _neutron_module_call(
+        'list_subnets', name=subnet_name, **connection_args)
+    subnet_id = existing_subnet[subnet_name]['id']
+
+    ret = {}
+    existing_ports = _neutron_module_call(
+        'list_ports', **connection_args)
+    existing_floatingips = _neutron_module_call(
+        'list_floatingips', **connection_args)
+
+    tenant = __salt__['keystone.tenant_get'](name=tenant_name, profile=profile, **connection_args)
+    tenant_id = tenant[tenant_name]['id']
+    existing_network = _neutron_module_call(
+            'list_networks', name=network, **connection_args)
+    floating_network_id = existing_network[network]['id']
+
+    for key, value in existing_ports.iteritems():
+        try:
+            if value['fixed_ips'][0]['subnet_id'] == subnet_id and value['device_id'] == instance_id:
+                port_id=value['id']
+        except:
+            pass
+    for key, value in existing_floatingips.iteritems():
+        try:
+            if value['floating_network_id'] == floating_network_id and value['port_id'] == port_id and value['tenant_id'] == tenant_id:
+                fip_exists = True
+                break
+        except:
+            pass
+
+    if fip_exists == False:
+        for key, value in existing_ports.iteritems():
+            try:
+                if value['fixed_ips'][0]['subnet_id'] == subnet_id and value['device_id'] == instance_id:
+                    ret = _neutron_module_call('create_floatingip', floating_network_id=floating_network_id, port_id=value['id'], tenant_id=tenant_id, **connection_args)
+            except:
+                pass
+        return _created('port', 'floatingip', ret)
+    else:
+        return _no_change('for instance {0}'.format(name), 'floatingip')
+
 def security_group_present(name=None,
                            tenant=None,
                            description=None,

@@ -7,7 +7,9 @@ neutron:
     version: liberty
     backend:
       engine: contrail
+      #contrail_discovery_host
       host: 127.0.0.1
+      port: 8082
       user: admin
       password: password
       token: token

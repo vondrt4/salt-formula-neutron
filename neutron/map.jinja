@@ -1,7 +1,7 @@
 
 {% set compute = salt['grains.filter_by']({
     'Debian': {
-        'pkgs': ['neutron-openvswitch-agent', 'openvswitch-switch', 'openvswitch-datapath-dkms', 'python-pycadf'],
+        'pkgs': ['neutron-openvswitch-agent', 'openvswitch-switch', 'python-pycadf'],
         'services': ['neutron-openvswitch-agent'],
         'audit': {
           'enabled': false

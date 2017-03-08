@@ -58,6 +58,35 @@ Note: The pagination is useful to retrieve a large bunch of resources,
 because a single request may fail (timeout). This is enabled with both
 parameters *allow_pagination* and *pagination_max_limit* as shown above.
 
+Neutron lbaas provides on the controller node
+
+.. code-block:: yaml
+
+  neutron:
+    server:
+      lbaas:
+        enabled: true
+        providers:
+          avi_adc:
+            enabled: true
+            engine: avinetworks
+            controller_address: 10.182.129.239
+            controller_user: admin
+            controller_password: Cloudlab2016
+            controller_cloud_name: Default-Cloud
+          avi_adc2:
+            engine: avinetworks
+            ...
+
+Note: If you want contrail lbaas then backend is only required. Lbaas in pillar should be define only if it should be disabled.
+
+.. code-block:: yaml
+
+  neutron:
+    server:
+      lbaas:
+        enabled: disabled
+
 
 Neutron VXLAN tenant networks with Network Nodes (with DVR for East-West
  and Network node for North-South)

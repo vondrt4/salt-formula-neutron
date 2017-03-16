@@ -40,7 +40,9 @@ core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.Neutr
 
 core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
 
-service_plugins =neutron.services.l3_router.l3_router_plugin.L3RouterPlugin,neutron.services.metering.metering_plugin.MeteringPlugin
+service_plugins =neutron.services.l3_router.l3_router_plugin.L3RouterPlugin,neutron.services.metering.metering_plugin.MeteringPlugin{%- if server.lbaas is defined -%}
+,neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2
+{%- endif -%}
 
 {% endif %}
 
@@ -1627,7 +1629,31 @@ quota_driver = neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDr
 # cipher list format. (string value)
 #ciphers = <None>
 [service_providers]
-{% if server.backend.engine == "contrail" %}
+
+{% if server.lbaas is defined -%}
+
+{%- if server.lbaas.enabled -%}
+
+{%- for lbaas_name, lbaas in server.lbaas.providers.iteritems() %}
+
+{%- if lbaas.engine == "avinetworks" -%}
+service_provider=LOADBALANCERV2:{{ lbaas_name }}:neutron_lbaas.drivers.avi.avi_driver.AviDriver
+
+[{{ lbaas_name }}]
+address={{ lbaas.controller_address }}
+user={{ lbaas.controller_user }}
+password={{ lbaas.controller_password }}
+cloud={{ lbaas.controller_cloud_name }}
+{%- endif -%}
+
+{%- endfor -%}
+
+{% endif %}
+
+{% elif server.backend.engine == "contrail" %}
+
 service_provider = LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default
+
 {% include "neutron/files/"+server.version+"/ContrailPlugin.ini" %}
+
 {% endif %}

@@ -7,7 +7,6 @@ neutron_client_packages:
 
 
 {%- for identity_name, identity in client.server.iteritems() %}
-
 {%- if identity.network is defined %}
 
 {%- for network_name, network in identity.network.iteritems() %}
@@ -17,6 +16,9 @@ neutron_openstack_network_{{ network_name }}:
     - name: {{ network_name }}
     - profile: {{ identity_name }}
     - tenant: {{ network.tenant }}
+    {%- if identity.endpoint_type is defined %}
+    - endpoint_type: {{ identity.endpoint_type }}
+    {%- endif %}
 
     {%- if network.provider_network_type is defined %}
     - provider_network_type: {{ network.provider_network_type }}
@@ -46,6 +48,9 @@ neutron_openstack_subnet_{{ subnet_name }}:
     - network: {{ network_name }}
     - profile: {{ identity_name }}
     - tenant: {{ network.tenant }}
+    {%- if identity.endpoint_type is defined %}
+    - endpoint_type: {{ identity.endpoint_type }}
+    {%- endif %}
 
     {%- if subnet.cidr is defined %}
     - cidr: {{ subnet.cidr  }}
@@ -90,6 +95,9 @@ neutron_openstack_router_{{ router_name }}:
     - profile: {{ identity_name }}
     - tenant: {{ router.tenant }}
     - admin_state_up: {{ router.admin_state_up }}
+    {%- if identity.endpoint_type is defined %}
+    - endpoint_type: {{ identity.endpoint_type }}
+    {%- endif %}
 {%- endfor %}
 
 {%- endif %}
@@ -104,6 +112,9 @@ openstack_security_group_{{ security_group_name }}:
     - rules: {{ security_group.rules }}
     - profile: {{ identity_name }}
     - tenant: {{ security_group.tenant }}
+    {%- if identity.endpoint_type is defined %}
+    - endpoint_type: {{ identity.endpoint_type }}
+    {%- endif %}
 {%- endfor %}
 
 {%- endif %}
@@ -118,6 +129,9 @@ neutron_floating_ip_for_{{ instance_name }}:
     - name: {{ instance.server }}
     - network:  {{ instance.network }}
     - profile: {{ identity_name }}
+    {%- if identity.endpoint_type is defined %}
+    - endpoint_type: {{ identity.endpoint_type }}
+    {%- endif %}
 
 {%- endfor %}
 

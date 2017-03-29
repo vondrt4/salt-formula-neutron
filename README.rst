@@ -701,6 +701,7 @@ Neutron networks
         enabled: true
         server:
           identity:
+            endpoint_type: internalURL
             network:
               inet1:
                 tenant: demo
@@ -740,6 +741,7 @@ Neutron routers
         enabled: true
         server:
           identity:
+            endpoint_type: internalURL
             router:
               inet1-router:
                 tenant: demo
@@ -764,6 +766,7 @@ Neutron security groups
         enabled: true
         server:
           identity:
+            endpoint_type: internalURL
             security_group:
               security_group1:
                 tenant: demo
@@ -800,6 +803,7 @@ Floating IP addresses
         enabled: true
         server:
           identity:
+            endpoint_type: internalURL
             floating_ip:
               prx01-instance:
                 server: prx01.mk22-lab-basic.local

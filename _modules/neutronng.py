@@ -43,9 +43,15 @@ def _autheticate(func_name):
                 nkwargs.update({kwarg: kwargs[kwarg]})
         kstone = __salt__['keystone.auth'](**connection_args)
         token = kstone.auth_token
+
+        if kwargs.get('connection_endpoint_type') == None:
+            endpoint_type = 'internalURL'
+        else:
+            endpoint_type = kwargs.get('connection_endpoint_type')
+
         endpoint = kstone.service_catalog.url_for(
             service_type='network',
-            endpoint_type='publicURL')
+            endpoint_type=endpoint_type)
         neutron_interface = client.Client(
             endpoint_url=endpoint, token=token)
         return_data = func_name(neutron_interface, *args, **nkwargs)

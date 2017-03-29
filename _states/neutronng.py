@@ -42,7 +42,7 @@ def _neutron_module_call(method, *args, **kwargs):
     return __salt__['neutronng.{0}'.format(method)](*args, **kwargs)
 
 
-def _auth(profile=None):
+def _auth(profile=None, endpoint_type=None):
     '''
     Set up neutron credentials
     '''
@@ -52,12 +52,12 @@ def _auth(profile=None):
         password = credentials['keystone.password']
         tenant = credentials['keystone.tenant']
         auth_url = credentials['keystone.auth_url']
-
     kwargs = {
         'connection_user': user,
         'connection_password': password,
         'connection_tenant': tenant,
         'connection_auth_url': auth_url
+        'connection_endpoint_type': endpoint_type
     }
 
     return kwargs
@@ -71,14 +71,15 @@ def network_present(name=None,
                     admin_state_up=None,
                     shared=None,
                     provider_segmentation_id=None,
-                    profile=None):
+                    profile=None,
+                    endpoint_type=None):
     '''
     Ensure that the neutron network is present with the specified properties.
     name
         The name of the network to manage
     '''
     tenant_name = tenant
-    connection_args = _auth(profile)
+    connection_args = _auth(profile, endpoint_type)
     try:
         tenant_id = __salt__['keystone.tenant_get'](
             name=tenant_name, **connection_args)[tenant_name]['id']
@@ -86,11 +87,8 @@ def network_present(name=None,
         tenant_id = None
         LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
             connection_args['connection_user']))
-    existing_networks = _neutron_module_call(
-        'list_networks', **connection_args)
-    for network in existing_networks:
-        if network.get(name) == name:
-            existing_network = network
+    existing_network = _neutron_module_call(
+        'list_networks', name=name, **connection_args)
     network_arguments = _get_non_null_args(
         name=name,
         provider_network_type=provider_network_type,
@@ -142,8 +140,8 @@ def network_present(name=None,
 
 
 @_test_call
-def network_absent(name, profile=None):
-    connection_args = _auth(profile)
+def network_absent(name, profile=None,endpoint_type=None):
+    connection_args = _auth(profile, endpoint_type)
     existing_network = _neutron_module_call(
         'list_networks', name=name, **connection_args)
     if existing_network:
@@ -166,13 +164,14 @@ def subnet_present(name=None,
                    gateway_ip=None,
                    dns_nameservers=None,
                    host_routes=None,
-                   profile=None):
+                   profile=None,
+                   endpoint_type=None):
     '''
     Ensure that the neutron subnet is present with the specified properties.
     name
         The name of the subnet to manage
     '''
-    connection_args = _auth(profile)
+    connection_args = _auth(profile, endpoint_type)
     tenant_name = tenant
     try:
         tenant_id = __salt__['keystone.tenant_get'](
@@ -235,8 +234,8 @@ def subnet_present(name=None,
 
 
 @_test_call
-def subnet_absent(name, profile=None):
-    connection_args = _auth(profile)
+def subnet_absent(name, profile=None, endpoint_type=None):
+    connection_args = _auth(profile, endpoint_type)
     existing_subnet = _neutron_module_call(
         'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
     if existing_subnet:
@@ -255,7 +254,8 @@ def router_present(name=None,
                    gateway_network=None,
                    interfaces=None,
                    admin_state_up=True,
-                   profile=None):
+                   profile=None,
+                   endpoint_type=None):
     '''
     Ensure that the neutron router is present with the specified properties.
     name
@@ -265,7 +265,7 @@ def router_present(name=None,
     interfaces
         list of subnets the router attaches to
     '''
-    connection_args = _auth(profile)
+    connection_args = _auth(profile, endpoint_type)
     tenant_name = tenant
     try:
         tenant_id = __salt__['keystone.tenant_get'](
@@ -341,13 +341,14 @@ def floatingip_present(name=None,
                        network=None,
                        port_id=None,
                        fip_exists=False,
-                       profile=None):
+                       profile=None,
+                       endpoint_type=None):
     '''
     Ensure that the floating ip address is present for an instance
     '''
     instance_id = __salt__['novang.server_get'](name=name, tenant_name=tenant_name, profile=profile)
     subnet_name = subnet
-    connection_args = _auth(profile)
+    connection_args = _auth(profile, endpoint_type)
     existing_subnet = _neutron_module_call(
         'list_subnets', name=subnet_name, **connection_args)
     subnet_id = existing_subnet[subnet_name]['id']
@@ -393,7 +394,8 @@ def security_group_present(name=None,
                            tenant=None,
                            description=None,
                            rules=[],
-                           profile=None):
+                           profile=None,
+                           endpoint_type=None):
     '''
     Ensure that the security group is present with the specified properties.
     name
@@ -406,7 +408,7 @@ def security_group_present(name=None,
     # If the user is an admin, he's able to see the security groups from
     # other tenants. In this case, we'll use the tenant id to get an existing
     # security group.
-    connection_args = _auth(profile)
+    connection_args = _auth(profile, endpoint_type)
     tenant_name = tenant
     try:
         tenant_id = __salt__['keystone.tenant_get'](

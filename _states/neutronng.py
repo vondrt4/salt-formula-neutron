@@ -56,7 +56,7 @@ def _auth(profile=None, endpoint_type=None):
         'connection_user': user,
         'connection_password': password,
         'connection_tenant': tenant,
-        'connection_auth_url': auth_url
+        'connection_auth_url': auth_url,
         'connection_endpoint_type': endpoint_type
     }
 
@@ -103,7 +103,7 @@ def network_present(name=None,
         network_arguments.update(connection_args)
         _neutron_module_call('create_network', **network_arguments)
         existing_networks = _neutron_module_call(
-            'list_networks', **connection_args)
+            'list_networks',name=name, **connection_args)
         for network in existing_networks:
             if network.get(name) == name:
                 existing_network = network

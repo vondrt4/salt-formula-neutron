@@ -2705,12 +2705,6 @@
                     "$interval"
                   ],
                   "type": "time"
-                },
-                {
-                  "params": [
-                    "0"
-                  ],
-                  "type": "fill"
                 }
               ],
               "groupByTags": [
@@ -2718,7 +2712,7 @@
               ],
               "measurement": "openstack_neutron_networks",
               "policy": "default",
-              "query": "SELECT last(\"value\") FROM \"openstack_neutron_networks\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval) fill(0)",
+              "query": "SELECT last(\"value\") FROM \"openstack_neutron_networks\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval)",
               "rawQuery": false,
               "refId": "A",
               "resultFormat": "time_series",
@@ -2928,18 +2922,12 @@
                     "$interval"
                   ],
                   "type": "time"
-                },
-                {
-                  "params": [
-                    "0"
-                  ],
-                  "type": "fill"
                 }
               ],
               "groupByTags": [],
               "measurement": "openstack_neutron_subnets",
               "policy": "default",
-              "query": "SELECT last(\"value\") FROM \"openstack_neutron_subnets\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval) fill(0)",
+              "query": "SELECT last(\"value\") FROM \"openstack_neutron_subnets\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval)",
               "rawQuery": false,
               "refId": "A",
               "resultFormat": "time_series",
@@ -3166,12 +3154,6 @@
                     "owner"
                   ],
                   "type": "tag"
-                },
-                {
-                  "params": [
-                    "0"
-                  ],
-                  "type": "fill"
                 }
               ],
               "groupByTags": [
@@ -3179,7 +3161,7 @@
               ],
               "measurement": "openstack_neutron_ports",
               "policy": "default",
-              "query": "SELECT last(\"value\") FROM \"openstack_neutron_ports\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval) fill(0)",
+              "query": "SELECT last(\"value\") FROM \"openstack_neutron_ports\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval)",
               "rawQuery": false,
               "refId": "A",
               "resultFormat": "time_series",
@@ -3401,12 +3383,6 @@
                     "state"
                   ],
                   "type": "tag"
-                },
-                {
-                  "params": [
-                    "0"
-                  ],
-                  "type": "fill"
                 }
               ],
               "groupByTags": [
@@ -3414,7 +3390,7 @@
               ],
               "measurement": "openstack_neutron_routers",
               "policy": "default",
-              "query": "SELECT last(\"value\") FROM \"openstack_neutron_routers\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval) fill(0)",
+              "query": "SELECT last(\"value\") FROM \"openstack_neutron_routers\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval)",
               "rawQuery": false,
               "refId": "A",
               "resultFormat": "time_series",
@@ -3634,12 +3610,6 @@
                     "state"
                   ],
                   "type": "tag"
-                },
-                {
-                  "params": [
-                    "0"
-                  ],
-                  "type": "fill"
                 }
               ],
               "groupByTags": [
@@ -3647,7 +3617,7 @@
               ],
               "measurement": "openstack_neutron_floatingips",
               "policy": "default",
-              "query": "SELECT last(\"value\") FROM \"openstack_neutron_floatingips\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval) fill(0)",
+              "query": "SELECT last(\"value\") FROM \"openstack_neutron_floatingips\" WHERE \"environment_label\" =~ /^$environment$/ AND $timeFilter GROUP BY time($interval)",
               "rawQuery": false,
               "refId": "A",
               "resultFormat": "time_series",
@@ -3804,5 +3774,5 @@
   },
   "timezone": "browser",
   "title": "Neutron",
-  "version": 1
+  "version": 2
 }

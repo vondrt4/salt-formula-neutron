@@ -561,9 +561,9 @@ transport_url = rabbit://{% for member in server.message_queue.members -%}
                              {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', 5672) }}
                              {%- if not loop.last -%},{%- endif -%}
                          {%- endfor -%}
-                             {{ server.message_queue.virtual_host }}
+                             /{{ server.message_queue.virtual_host }}
 {%- else %}
-transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ member.get('port', 5672) }}{{ server.message_queue.virtual_host }}
+transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ server.message_queue.port }}{{ server.message_queue.virtual_host }}
 {%- endif %}
 
 # The default exchange under which topics are scoped. May be overridden by an
@@ -739,7 +739,7 @@ report_interval = 10
 # Deprecated group/name - [DATABASE]/sql_connection
 # Deprecated group/name - [sql]/connection
 {% if server.backend.engine == "ml2" %}
-connection = {{ server.database.engine }}+pymysql://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}?charset=utf8&read_timeout=60
+connection = {{ server.database.engine }}+pymysql://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}?charset=utf8
 {% else %}
 connection = sqlite:////var/lib/neutron/neutron.sqlite
 {% endif %}

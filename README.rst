@@ -278,6 +278,7 @@ Network Node only
         local_ip: 192.168.20.20 # br-mesh ip address
         dvr: False
         agent_mode: legacy
+        availability_zone: az1
         metadata:
           host: 127.0.0.1
           password: pass
@@ -387,6 +388,7 @@ Network Node only
         local_ip: 192.168.20.20 # br-mesh ip address
         dvr: True
         agent_mode: dvr_snat
+        availability_zone: az1
         metadata:
           host: 127.0.0.1
           password: pass
@@ -417,6 +419,7 @@ Compute Node
         dvr: True
         external_access: True     
         agent_mode: dvr
+        availability_zone: az1
         metadata:
           host: 127.0.0.1
           password: pass

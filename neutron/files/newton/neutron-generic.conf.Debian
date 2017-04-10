@@ -619,7 +619,7 @@ report_interval = 10
 #check_child_processes_interval = 60
 
 # Availability zone of this node (string value)
-#availability_zone = nova
+availability_zone = {{ neutron.availability_zone|default('nova') }}
 
 
 [cors]

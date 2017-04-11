@@ -1,6 +1,6 @@
-=======================
-Neutron Network Service
-=======================
+===============
+Neutron Formula
+===============
 
 Neutron is an OpenStack project to provide "networking as a service" between
 interface devices (e.g., vNICs) managed by other Openstack services (e.g.,
@@ -10,7 +10,7 @@ Starting in the Folsom release, Neutron is a core and supported part of the
 OpenStack platform (for Essex, we were an "incubated" project, which means use
 is suggested only for those who really know what they're doing with Neutron). 
 
-Sample pillars
+Sample Pillars
 ==============
 
 Neutron Server on the controller node
@@ -79,7 +79,8 @@ Neutron lbaas provides on the controller node
             engine: avinetworks
             ...
 
-Note: If you want contrail lbaas then backend is only required. Lbaas in pillar should be define only if it should be disabled.
+Note: If you want contrail lbaas then backend is only required. Lbaas in
+pillar should be define only if it should be disabled.
 
 .. code-block:: yaml
 
@@ -88,22 +89,20 @@ Note: If you want contrail lbaas then backend is only required. Lbaas in pillar 
       lbaas:
         enabled: disabled
 
+Neutron VXLAN tenant networks with Network nodes
+------------------------------------------------
 
-Neutron VXLAN tenant networks with Network Nodes (with DVR for East-West
- and Network node for North-South)
-=========================================================================
-===================================
+With DVR for East-West and Network node for North-South.
 
 This use case describes a model utilising VxLAN overlay with DVR. The DVR
- routers will only be utilized for traffic that is router within the cloud
-  infrastructure and that remains encapsulated. External traffic will be 
-  routed to via the network nodes. 
+routers will only be utilized for traffic that is router within the cloud
+infrastructure and that remains encapsulated. External traffic will be 
+routed to via the network nodes. 
 
 The intention is that each tenant will require at least two (2) vrouters 
 one to be utilised 
 
-Neutron Server only
--------------------
+Neutron Server
 
 .. code-block:: yaml
 
@@ -147,8 +146,7 @@ Neutron Server only
             ovs:
               driver: openvswitch
 
-Network Node only
------------------
+Network Node
 
 .. code-block:: yaml
 
@@ -177,7 +175,6 @@ Network Node only
               driver: openvswitch  
 
 Compute Node
--------------
 
 .. code-block:: yaml
 
@@ -208,14 +205,14 @@ Compute Node
         audit:
           enabled: false
 
+
 Neutron VXLAN tenant networks with Network Nodes (non DVR)
-==========================================================
+----------------------------------------------------------
 
 This section describes a network solution that utilises VxLAN overlay
  networks without DVR with all routers being managed on the network nodes.
 
-Neutron Server only
--------------------
+Neutron Server
 
 .. code-block:: yaml
 
@@ -259,8 +256,7 @@ Neutron Server only
             ovs:
               driver: openvswitch
 
-Network Node only
------------------
+Network Node
 
 .. code-block:: yaml
 
@@ -290,7 +286,6 @@ Network Node only
               driver: openvswitch  
 
 Compute Node
--------------
 
 .. code-block:: yaml
 
@@ -315,17 +310,16 @@ Compute Node
             ovs:
               driver: openvswitch
 
-Neutron VXLAN tenant networks with Network Nodes (with DVR for 
-East-West and North-South, DVR everywhere, Network node for SNAT)
-==============================================================
-========================================================
+Neutron VXLAN tenant networks with Network Nodes with DVR
+---------------------------------------------------------
+
+With DVR for East-West and North-South, DVR everywhere, Network node for SNAT.
 
 This section describes a network solution that utilises VxLAN 
 overlay networks with DVR with North-South and East-West. Network 
 Node is used only for SNAT.
 
-Neutron Server only
--------------------
+Neutron Server
 
 .. code-block:: yaml
 
@@ -369,8 +363,7 @@ Neutron Server only
             ovs:
               driver: openvswitch
 
-Network Node only
------------------
+Network Node
 
 .. code-block:: yaml
 
@@ -400,7 +393,6 @@ Network Node only
               driver: openvswitch  
 
 Compute Node
--------------
 
 .. code-block:: yaml
 
@@ -431,7 +423,6 @@ Compute Node
               driver: openvswitch
 
 Sample Linux network configuration for DVR
---------------------------------------------
 
 .. code-block:: yaml
 
@@ -495,12 +486,11 @@ Sample Linux network configuration for DVR
             - float-to-ex
 
 Neutron VLAN tenant networks with Network Nodes
-===============================================
+-----------------------------------------------
 
 VLAN tenant provider
 
 Neutron Server only
--------------------
 
 .. code-block:: yaml
 
@@ -523,7 +513,6 @@ Neutron Server only
               driver: openvswitch
 
 Compute node
--------------------
 
 .. code-block:: yaml
 
@@ -542,8 +531,9 @@ Compute node
             ovs:
               driver: openvswitch
 
+Advanced Neutron Features (DPDK, SR-IOV)
+
 Neutron OVS DPDK
-==================
 
 Enable datapath netdev for neutron openvswitch agent
 
@@ -569,7 +559,6 @@ Enable datapath netdev for neutron openvswitch agent
               driver: openvswitch
 
 Neutron OVS SR-IOV
-==================
 
 .. code-block:: yaml
 
@@ -602,8 +591,10 @@ Neutron OVS SR-IOV
             ovs:
               driver: openvswitch
 
+Neutron Server
+--------------
+
 Neutron Server with OpenContrail
-==================================
 
 .. code-block:: yaml
 
@@ -620,7 +611,6 @@ Neutron Server with OpenContrail
           token: token
 
 Neutron Server with Midonet
-===========================
 
 .. code-block:: yaml
 
@@ -633,8 +623,6 @@ Neutron Server with Midonet
           user: admin
           password: password
 
-Other
-=====
 
 Neutron Keystone region
 
@@ -651,7 +639,6 @@ Neutron Keystone region
         compute:
           region: RegionTwo
         ...
-
 
 Client-side RabbitMQ HA setup
 
@@ -692,8 +679,8 @@ Enable auditing filter, ie: CADF
       ....
 
 
-Client role
------------
+Neutron Client
+--------------
 
 Neutron networks
 
@@ -733,7 +720,6 @@ Neutron networks
           identity1:
             network:
               ...
-
 
 Neutron routers
 
@@ -819,41 +805,6 @@ Floating IP addresses
 .. note:: The network must have flag router:external set to True.
           Instance port in the stated subnet will be associated with the dynamically generated floating IP.
 
-
-Usage
-=====
-
-Fix RDO Neutron installation
-
-.. code-block:: yaml
-
-    neutron-db-manage --config-file /usr/share/neutron/neutron-dist.conf --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugin.ini stamp havana
-
-Documentation and Bugs
-============================
-
-To learn how to deploy OpenStack Salt, consult the documentation available
-online at:
-
-    https://wiki.openstack.org/wiki/OpenStackSalt
-
-In the unfortunate event that bugs are discovered, they should be reported to
-the appropriate bug tracker. If you obtained the software from a 3rd party
-operating system vendor, it is often wise to use their own bug tracker for
-reporting problems. In all other cases use the master OpenStack bug tracker,
-available at:
-
-    http://bugs.launchpad.net/openstack-salt
-
-Developers wishing to work on the OpenStack Salt project should always base
-their work on the latest formulas code, available from the master GIT
-repository at:
-
-    https://git.openstack.org/cgit/openstack/salt-formula-neutron
-
-Developers should also join the discussion on the IRC list, at:
-
-    https://wiki.openstack.org/wiki/Meetings/openstack-salt
 
 Documentation and Bugs
 ======================

@@ -89,6 +89,21 @@ pillar should be define only if it should be disabled.
       lbaas:
         enabled: disabled
 
+Enable CORS parameters
+
+.. code-block:: yaml
+
+    neutron:
+      server:
+        cors:
+          allowed_origin: https:localhost.local,http:localhost.local
+          expose_headers: X-Auth-Token,X-Openstack-Request-Id,X-Subject-Token
+          allow_methods: GET,PUT,POST,DELETE,PATCH
+          allow_headers: X-Auth-Token,X-Openstack-Request-Id,X-Subject-Token
+          allow_credentials: True
+          max_age: 86400
+
+
 Neutron VXLAN tenant networks with Network nodes
 ------------------------------------------------
 

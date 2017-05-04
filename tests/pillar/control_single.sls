@@ -46,3 +46,7 @@ neutron:
       user: nova
       password: password
       tenant: service
+    policy:
+      create_subnet: 'rule:admin_or_network_owner'
+      'get_network:queue_id': 'rule:admin_only'
+      'create_network:shared':

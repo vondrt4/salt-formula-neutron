@@ -80,6 +80,30 @@ neutron_db_manage:
     - require:
       - pkg: neutron_server_packages
 
+{%- for name, rule in server.get('policy', {}).iteritems() %}
+
+{%- if rule != None %}
+rule_{{ name }}_present:
+  keystone_policy.rule_present:
+  - path: /etc/neutron/policy.json
+  - name: {{ name }}
+  - rule: {{ rule }}
+  - require:
+    - pkg: neutron_server_packages
+
+{%- else %}
+
+rule_{{ name }}_absent:
+  keystone_policy.rule_absent:
+  - path: /etc/neutron/policy.json
+  - name: {{ name }}
+  - require:
+    - pkg: neutron_server_packages
+
+{%- endif %}
+
+{%- endfor %}
+
 {%- if grains.os_family == "Debian" %}
 
 /etc/default/neutron-server:

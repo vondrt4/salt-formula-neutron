@@ -51,4 +51,8 @@ neutron:
     audit:
       filter_factory: 'keystonemiddleware.audit:filter_factory'
       map_file: '/etc/pycadf/neutron_api_audit_map.conf'
+    policy:
+      create_subnet: 'rule:admin_or_network_owner'
+      'get_network:queue_id': 'rule:admin_only'
+      'create_network:shared':
 

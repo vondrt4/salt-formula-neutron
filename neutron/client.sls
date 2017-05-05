@@ -45,7 +45,7 @@ neutron_openstack_network_{{ network_name }}:
 neutron_openstack_subnet_{{ subnet_name }}:
   neutronng.subnet_present:
     - name: {{ subnet_name }}
-    - network: {{ network_name }}
+    - network_name: {{ network_name }}
     - profile: {{ identity_name }}
     - tenant: {{ network.tenant }}
     {%- if identity.endpoint_type is defined %}

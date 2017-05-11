@@ -16,7 +16,7 @@ doc:
         bind:
           value: {{ server.bind.address }}:{{ server.bind.port }}
         plugin:
-          value: {{ server.plugin }}
+          value: {{ server.backend.engine }}
         version:
           name: "Version"
           value: {{ server.version }}

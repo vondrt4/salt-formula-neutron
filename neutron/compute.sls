@@ -50,6 +50,18 @@ neutron_dvr_packages:
     - neutron-l3-agent
     - neutron-metadata-agent
 
+neutron_dvr_agents:
+  service.running:
+    - enable: true
+    - names:
+      - neutron-l3-agent
+      - neutron-metadata-agent
+    - watch:
+      - file: /etc/neutron/l3_agent.ini
+      - file: /etc/neutron/metadata_agent.ini
+    - require:
+      - pkg: neutron_dvr_packages
+
 /etc/neutron/l3_agent.ini:
   file.managed:
   - source: salt://neutron/files/{{ compute.version }}/l3_agent.ini
@@ -57,7 +69,7 @@ neutron_dvr_packages:
   - watch_in:
     - service: neutron_compute_services
   - require:
-    - pkg: neutron_compute_packages
+    - pkg: neutron_dvr_packages
 
 /etc/neutron/metadata_agent.ini:
   file.managed:
@@ -66,7 +78,7 @@ neutron_dvr_packages:
   - watch_in:
     - service: neutron_compute_services
   - require:
-    - pkg: neutron_compute_packages
+    - pkg: neutron_dvr_packages
 
 {% endif %}
 

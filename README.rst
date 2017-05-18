@@ -59,6 +59,20 @@ Note: The pagination is useful to retrieve a large bunch of resources,
 because a single request may fail (timeout). This is enabled with both
 parameters *allow_pagination* and *pagination_max_limit* as shown above.
 
+
+Configuration of policy.json file
+
+.. code-block:: yaml
+
+    neutron:
+      server:
+        ....
+        policy:
+          create_subnet: 'rule:admin_or_network_owner'
+          'get_network:queue_id': 'rule:admin_only'
+          # Add key without value to remove line from policy.json
+          'create_network:shared':
+
 Neutron lbaas provides on the controller node
 
 .. code-block:: yaml

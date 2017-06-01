@@ -28,14 +28,11 @@ bind_port = {{ server.bind.port }}
 
 {% if server.backend.engine == "contrail" %}
 
-# TEMPORARY - until neutron v2 contrail package would be supported
-#api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions
-api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
+api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions
 # The core plugin Neutron will use (string value)
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 
-# TEMPORARY - until neutron v2 contrail package would be supported
-#service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
+service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
 {% elif server.backend.engine == "ml2" %}
 
 core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
@@ -842,7 +839,19 @@ admin_tenant_name={{ server.backend.tenant }}
 auth_region={{ server.identity.region }}
 auth_protocol=http
 revocation_cache_time = 10
+{% if server.backend.engine == "contrail" %}
+# LBaaS contrail neutron plugin for versions 3.x expects auth_type to be 
+# 'keystone' or 'noauth'
+# This behaviour is fixed after the release MCP1.0 by using auth_strategy
+# instead of auth_type, until this is backported to MCP1.0 auth_type must be
+# set to keystone, noauth or commented out.
+#
+# When not defined, contrail defaults to 'keystone'
+#
+#auth_type=keystone
+{% else %}
 auth_type = password
+{% endif %}
 auth_host = {{ server.identity.host }}
 auth_port = 35357
 user_domain_id = {{ server.identity.get('domain', 'default') }}
@@ -1671,7 +1680,7 @@ cloud={{ lbaas.controller_cloud_name }}
 
 {% elif server.backend.engine == "contrail" %}
 
-service_provider = LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default
+service_provider = LOADBALANCERV2:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDummyDriver:default
 
 {% include "neutron/files/"+server.version+"/ContrailPlugin.ini" %}
 

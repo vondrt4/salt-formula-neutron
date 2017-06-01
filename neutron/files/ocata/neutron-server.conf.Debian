@@ -34,14 +34,11 @@ auth_strategy = keystone
 
 {% if server.backend.engine == "contrail" %}
 
-# TEMPORARY - until neutron v2 contrail package would be supported
-#api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions
-api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
+api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions
 # The core plugin Neutron will use (string value)
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 
-# TEMPORARY - until neutron v2 contrail package would be supported
-#service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
+service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
 {% elif server.backend.engine == "ml2" %}
 
 core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
@@ -2179,7 +2176,7 @@ cloud={{ lbaas.controller_cloud_name }}
 
 {% elif server.backend.engine == "contrail" %}
 
-service_provider = LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default
+service_provider = LOADBALANCERV2:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDummyDriver:default
 
 {% include "neutron/files/"+server.version+"/ContrailPlugin.ini" %}
 

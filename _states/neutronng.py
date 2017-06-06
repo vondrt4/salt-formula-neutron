@@ -5,8 +5,8 @@ Management of Neutron resources
 :depends:   - neutronclient Python module
 :configuration: See :py:mod:`salt.modules.neutron` for setup instructions.
 .. code-block:: yaml
-    neutron network present:
-      neutron.network_present:
+    neutronng network present:
+      neutronng.network_present:
         - name: Netone
         - provider_physical_network: PHysnet1
         - provider_network_type: vlan
@@ -41,6 +41,15 @@ def _test_call(method):
 def _neutron_module_call(method, *args, **kwargs):
     return __salt__['neutronng.{0}'.format(method)](*args, **kwargs)
 
+def _get_tenant_id(tenant_name, *args, **kwargs):
+    try:
+        tenant_id = __salt__['keystone.tenant_get'](
+            name=tenant_name, **kwargs)[tenant_name]['id']
+    except:
+        tenant_id = None
+        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
+            kwargs.get('connection_user')))
+    return tenant_id
 
 def _auth(profile=None, endpoint_type=None):
     '''
@@ -57,13 +66,15 @@ def _auth(profile=None, endpoint_type=None):
         'connection_password': password,
         'connection_tenant': tenant,
         'connection_auth_url': auth_url,
-        'connection_endpoint_type': endpoint_type
+        'connection_endpoint_type': endpoint_type,
+        'profile': profile
     }
 
     return kwargs
 
 @_test_call
 def network_present(name=None,
+                    network_id=None,
                     tenant=None,
                     provider_network_type=None,
                     provider_physical_network=None,
@@ -78,17 +89,12 @@ def network_present(name=None,
     name
         The name of the network to manage
     '''
-    tenant_name = tenant
     connection_args = _auth(profile, endpoint_type)
-    try:
-        tenant_id = __salt__['keystone.tenant_get'](
-            name=tenant_name, **connection_args)[tenant_name]['id']
-    except:
-        tenant_id = None
-        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
-            connection_args['connection_user']))
-    existing_network = _neutron_module_call(
-        'list_networks', name=name, **connection_args)
+    tenant_id = _get_tenant_id(tenant_name=tenant, **connection_args)
+
+    existing_networks = _neutron_module_call(
+        'list_networks', name=name, tenant_id=tenant_id,
+        **connection_args)['networks']
     network_arguments = _get_non_null_args(
         name=name,
         provider_network_type=provider_network_type,
@@ -99,64 +105,63 @@ def network_present(name=None,
         tenant_id=tenant_id,
         provider_segmentation_id=provider_segmentation_id)
 
-    if not existing_network:
+    if len(existing_networks) == 0:
         network_arguments.update(connection_args)
-        _neutron_module_call('create_network', **network_arguments)
-        existing_networks = _neutron_module_call(
-            'list_networks',name=name, **connection_args)
-        for network in existing_networks:
-            if network.get(name) == name:
-                existing_network = network
-        if existing_network:
-            return _created(name, 'network', existing_network[name])
-        return _update_failed(name, 'network')
+        res = _neutron_module_call(
+            'create_network', **network_arguments)['network']
 
-    LOG.info('CONNECTION STRINGS' + str(connection_args))
-    LOG.info('existing ' + str(existing_network))
-    LOG.info('new ' + str(network_arguments))
-    existing_network = dict((key.replace(':', '_', 1), value)
-                            for key, value in
-                            existing_network[name].iteritems())
-    # generate differential
-    diff = dict((key, value) for key, value in network_arguments.iteritems()
-                if existing_network.get(key, None) != value)
-    if diff:
-        # update the changes
-        network_arguments = diff.copy()
-        network_arguments.update(connection_args)
-        try:
-            LOG.debug('updating network {0} with changes {1}'.format(
-                name, str(diff)))
-            _neutron_module_call('update_network',
-                                 existing_network['id'],
-                                 **network_arguments)
-            changes_dict = _created(name, 'network', diff)
-            changes_dict['comment'] = '{1} {0} updated'.format(name, 'network')
-            return changes_dict
-        except:
-            LOG.exception('Could not update network {0}'.format(name))
-            return _update_failed(name, 'network')
-    return _no_change(name, 'network')
+        if res.get('name') == name:
+            return _created(name, 'network', res['name'])
+
+    elif len(existing_networks) > 1:
+        LOG.error("More than one network found with the name: {0}".format(
+                  name))
+
+    elif len(existing_networks) == 1:
+        existing_network = existing_networks[0]
+        LOG.info('CONNECTION STRINGS' + str(connection_args))
+        LOG.info('existing ' + str(existing_network))
+        LOG.info('new ' + str(network_arguments))
+        existing_network = dict((key.replace(':', '_', 1), value)
+                                for key, value in
+                                existing_network.iteritems())
+        # generate differential
+        diff = dict((key, value) for key, value in network_arguments.iteritems()
+                    if existing_network.get(key, None) != value)
+        if diff:
+            # update the changes
+            network_arguments = diff.copy()
+            network_arguments.update(connection_args)
+            try:
+                LOG.debug('updating network {0} with changes {1}'.format(
+                    name, str(diff)))
+                _neutron_module_call('update_network',
+                                     existing_network['id'],
+                                     **network_arguments)
+                changes_dict = _created(name, 'network', diff)
+                changes_dict['comment'] = '{1} {0} updated'.format(name, 'network')
+                return changes_dict
+            except:
+                LOG.error('Could not update network {0}'.format(name))
+                return _update_failed(name, 'network')
+        return _no_change(name, 'network')
+    return _create_failed(name, 'network')
 
 
 @_test_call
-def network_absent(name, profile=None,endpoint_type=None):
+def network_absent(name, network_id=None, profile=None, endpoint_type=None):
     connection_args = _auth(profile, endpoint_type)
-    existing_network = _neutron_module_call(
-        'list_networks', name=name, **connection_args)
-    if existing_network:
-        _neutron_module_call(
-            'delete_network', existing_network[name]['id'], **connection_args)
-        if _neutron_module_call('list_networks', name=name, **connection_args):
-            return _delete_failed(name, 'network')
-        return _deleted(name, 'network', existing_network[name])
-    return _absent(name, 'network')
+    identifier = network_id or name
+    _neutron_module_call(
+        'delete_network', identifier, **connection_args)
+    return _absent(identifier, 'network')
 
 
 @_test_call
-def subnet_present(name=None,
+def subnet_present(name,
+                   network_name=None,
+                   network_id=None,
                    tenant=None,
-                   network=None,
                    cidr=None,
                    ip_version=4,
                    enable_dhcp=True,
@@ -171,20 +176,19 @@ def subnet_present(name=None,
     name
         The name of the subnet to manage
     '''
+    if network_name is None and network_id is None:
+        LOG.error("Network identificator name or uuid should be provided.")
+        return _create_failed(name, 'subnet')
+
     connection_args = _auth(profile, endpoint_type)
-    tenant_name = tenant
-    try:
-        tenant_id = __salt__['keystone.tenant_get'](
-            name=tenant_name, **connection_args)[tenant_name]['id']
-    except:
-        tenant_id = None
-        LOG.debug('Cannot get the tenant id. User {0} is not an admin.'.format(
-            connection_args['connection_user']))
-    existing_subnet = _neutron_module_call(
-        'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
+    tenant_id = _get_tenant_id(tenant_name=tenant, **connection_args)
+
+    existing_subnets = _neutron_module_call(
+        'list_subnets', tenant_id=tenant_id, name=name,
+         **connection_args)['subnets']
+
     subnet_arguments = _get_non_null_args(
         name=name,
-        network=network,
         cidr=cidr,
         ip_version=ip_version,
         enable_dhcp=enable_dhcp,
@@ -192,29 +196,43 @@ def subnet_present(name=None,
         gateway_ip=gateway_ip,
         dns_nameservers=dns_nameservers,
         host_routes=host_routes)
-    # replace network with network_id
-    if 'network' in subnet_arguments:
-        network = subnet_arguments.pop('network', None)
-        existing_network = _neutron_module_call(
-            'list_networks', tenant_id=tenant_id, name=network, **connection_args)
-        if existing_network:
-            subnet_arguments['network_id'] = existing_network[network]['id']
-    if not existing_subnet:
+
+    if network_id is None and network_name:
+        existing_networks = _neutron_module_call(
+            'list_networks', tenant_id=tenant_id, name=network_name,
+            **connection_args)['networks']
+        if len(existing_networks) == 0:
+            LOG.error("Can't find network with name: {0}".format(network_name))
+        elif len(existing_networks) == 1:
+            network_id = existing_networks[0]['id']
+        elif len(existing_networks) > 1:
+            LOG.error("Multiple networks with name: {0} found.".format(
+                      network_name))
+
+    if network_id is None:
+        return _create_failed(name, 'subnet')
+
+    subnet_arguments['network_id'] = network_id
+
+    if len(existing_subnets) == 0:
         subnet_arguments.update(connection_args)
-        _neutron_module_call('create_subnet', tenant_id=tenant_id, **subnet_arguments)
-        existing_subnet = _neutron_module_call(
-            'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
-        if existing_subnet:
-            return _created(name, 'subnet', existing_subnet[name])
-        return _update_failed(name, 'subnet')
-    # change from internal representation
-    existing_subnet = existing_subnet[name]
-    # create differential
-    LOG.error('existing ' + str(existing_subnet))
-    LOG.error('new ' + str(subnet_arguments))
-    diff = dict((key, value) for key, value in subnet_arguments.iteritems()
-                if existing_subnet.get(key, None) != value)
-    if diff:
+        res = _neutron_module_call('create_subnet', tenant_id=tenant_id,
+                                   **subnet_arguments)['subnet']
+        if res.get('name') == name:
+            return _created(name, 'subnet', res)
+        return _create_failed(name, 'subnet')
+
+    elif len(existing_subnets) == 1:
+        existing_subnet = existing_subnets[0]
+
+        # create differential
+        LOG.error('existing ' + str(existing_subnet))
+        LOG.error('new ' + str(subnet_arguments))
+        diff = dict((key, value) for key, value in subnet_arguments.iteritems()
+                    if existing_subnet.get(key, None) != value)
+        if not diff:
+            return _no_change(name, 'subnet')
+
         # update the changes
         subnet_arguments = diff.copy()
         subnet_arguments.update(connection_args)
@@ -228,24 +246,22 @@ def subnet_present(name=None,
             changes_dict['comment'] = '{1} {0} updated'.format(name, 'subnet')
             return changes_dict
         except:
-            LOG.exception('Could not update subnet {0}'.format(name))
+            LOG.error('Could not update subnet {0}'.format(name))
             return _update_failed(name, 'subnet')
-    return _no_change(name, 'subnet')
+
+    elif len(existing_subnets) > 1:
+        LOG.error("Multiple subnets with name: {0} found".format(
+                  name))
+        return _create_failed(name, 'network')
 
 
 @_test_call
-def subnet_absent(name, profile=None, endpoint_type=None):
+def subnet_absent(name, subnet_id=None, profile=None, endpoint_type=None):
     connection_args = _auth(profile, endpoint_type)
-    existing_subnet = _neutron_module_call(
-        'list_subnets', tenant_id=tenant_id, name=name, **connection_args)
-    if existing_subnet:
-        _neutron_module_call(
-            'delete_subnet', existing_subnet[name]['id'], **connection_args)
-        if _neutron_module_call('list_subnets', name=name, **connection_args):
-            return _delete_failed(name, 'subnet')
-        return _deleted(name, 'subnet', existing_subnet[name])
+    identifier = subnet_id or name
+    _neutron_module_call(
+        'delete_subnet', identifier, **connection_args)
     return _absent(name, 'subnet')
-    return _absent(name, 'network')
 
 
 @_test_call
@@ -389,6 +405,7 @@ def floatingip_present(name=None,
         return _created('port', 'floatingip', ret)
     else:
         return _no_change('for instance {0}'.format(name), 'floatingip')
+
 
 def security_group_present(name=None,
                            tenant=None,

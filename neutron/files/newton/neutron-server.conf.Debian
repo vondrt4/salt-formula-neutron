@@ -1397,7 +1397,6 @@ rabbit_retry_backoff = 2
 # count). (integer value)
 # Deprecated group/name - [DEFAULT]/rabbit_max_retries
 #rabbit_max_retries = 0
-rabbit_max_retries = 0
 
 # Try to use HA queues in RabbitMQ (x-ha-policy: all). If you change this
 # option, you must wipe the RabbitMQ database. In RabbitMQ 3.0, queue mirroring

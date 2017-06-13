@@ -547,12 +547,6 @@ rpc_response_timeout=60
 # not set, we fall back to the rpc_backend option and driver specific
 # configuration. (string value)
 #transport_url = <None>
-
-# The messaging driver to use, defaults to rabbit. Other drivers include amqp
-# and zmq. (string value)
-#rpc_backend = rabbit
-rpc_backend = rabbit
-
 {%- if server.message_queue.members is defined %}
 transport_url = rabbit://{% for member in server.message_queue.members -%}
                              {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', 5672) }}
@@ -562,6 +556,11 @@ transport_url = rabbit://{% for member in server.message_queue.members -%}
 {%- else %}
 transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ server.message_queue.port }}/{{ server.message_queue.virtual_host }}
 {%- endif %}
+
+# The messaging driver to use, defaults to rabbit. Other drivers include amqp
+# and zmq. (string value)
+#rpc_backend = rabbit
+
 
 # The default exchange under which topics are scoped. May be overridden by an
 # exchange name specified in the transport_url option. (string value)
@@ -1398,7 +1397,6 @@ rabbit_retry_backoff = 2
 # count). (integer value)
 # Deprecated group/name - [DEFAULT]/rabbit_max_retries
 #rabbit_max_retries = 0
-rabbit_max_retries = 0
 
 # Try to use HA queues in RabbitMQ (x-ha-policy: all). If you change this
 # option, you must wipe the RabbitMQ database. In RabbitMQ 3.0, queue mirroring

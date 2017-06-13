@@ -514,6 +514,22 @@ Sample Linux network configuration for DVR
             use_ovs_ports:
             - float-to-ex
 
+Additonal VXLAN tenant network settings
+---------------------------------------
+
+The default multicast group of 224.0.0.1 only multicasts to a single subnet.
+Allow overriding it to allow larger underlay network topologies.
+
+Neutron Server
+
+.. code-block:: yaml
+
+    neutron:
+      server:
+        vxlan:
+          group: 239.0.0.0/8
+          vni_ranges: "2:65535"
+
 Neutron VLAN tenant networks with Network Nodes
 -----------------------------------------------
 

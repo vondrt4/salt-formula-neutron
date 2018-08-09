@@ -2,7 +2,7 @@
 [ml2]
 type_drivers = flat,vlan,gre,vxlan
 tenant_network_types = {{ neutron.tunnel_type  }}
-mechanism_drivers = openvswitch{%- if neutron.distributed %},l2population{%- endif %}
+mechanism_drivers = openvswitch{%- if neutron.dvr %},l2population{%- endif %}
 
 [ml2_type_flat]
 #flat_networks = external
@@ -32,7 +32,7 @@ bridge_mappings = external:br-ex
 tunnel_types = {{ neutron.tunnel_type }}
 root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 
-{%- if neutron.distributed %}
+{%- if neutron.dvr %}
 l2_population = True
 enable_distributed_routing = True
 {%- endif %}

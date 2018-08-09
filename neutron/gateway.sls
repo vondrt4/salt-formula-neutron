@@ -27,6 +27,7 @@ neutron_gateway_packages:
 /etc/neutron/dhcp_agent.ini:
   file.managed:
   - source: salt://neutron/files/{{ gateway.version }}/dhcp_agent.ini
+  - template: jinja
   - require:
     - pkg: neutron_gateway_packages
 

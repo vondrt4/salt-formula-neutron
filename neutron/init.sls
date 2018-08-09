@@ -5,8 +5,6 @@ include:
 {% endif %}
 {% if pillar.neutron.gateway is defined %}
 - neutron.gateway
-{% if pillar.neutron.network is defined %}
-- neutron.network
 {% endif %}
 {% if pillar.neutron.compute is defined %}
 - neutron.compute

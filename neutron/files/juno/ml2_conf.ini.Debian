@@ -23,7 +23,7 @@ enable_security_group = True
 enable_ipset = True
 
 [ovs]
-local_ip = {{ pillar.neutron.network.bind.address }}
+local_ip = {{ pillar.neutron.gateway.bind.address }}
 tenant_network_type = {{ neutron.tunnel_type }}
 tunnel_id_ranges = {%- if neutron.tunnel_type == 'gre' %} 32769:34000 {%- else %} 65537:69999 {%- endif %}
 enable_tunneling = True

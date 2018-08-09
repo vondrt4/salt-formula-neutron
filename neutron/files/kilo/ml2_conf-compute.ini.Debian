@@ -4,7 +4,7 @@
 
 type_drivers = flat,vlan,gre,vxlan
 tenant_network_types = {{ neutron.tunnel_type  }}
-mechanism_drivers = openvswitch{%- if neutron.distributed %},l2population{%- endif %}
+mechanism_drivers = openvswitch{%- if neutron.dvr %},l2population{%- endif %}
 
 [ml2_type_flat]
 #flat_networks = external

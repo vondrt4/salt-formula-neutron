@@ -3,7 +3,7 @@
 [DEFAULT]
 # Print more verbose output (set logging level to INFO instead of default WARNING level).
 # verbose = False
-verbose = true
+verbose = True
 
 # =========Start Global Config Option for Distributed L3 Router===============
 # Setting the "router_distributed" flag to "True" will default to the creation
@@ -12,6 +12,11 @@ verbose = true
 # value is "False" to support legacy mode (centralized) routers.
 #
 # router_distributed = False
+
+{%- if pillar.neutron.server.dvr %}
+router_distributed = True
+{%- endif %}
+
 #
 # ===========End Global Config Option for Distributed L3 Router===============
 
@@ -70,6 +75,8 @@ core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.Neutr
 api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
 {%- elif server.backend.engine == "midonet" %}
 core_plugin = midonet.neutron.plugin_v2.MidonetPluginV2
+{%- elif server.backend.engine == "ml2" %}
+core_plugin = ml2
 {%- endif %}
 
 # (ListOpt) List of service plugin entrypoints to be loaded from the
@@ -83,8 +90,8 @@ core_plugin = midonet.neutron.plugin_v2.MidonetPluginV2
 
 {%- if server.backend.engine == "contrail" %}
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin
-{%- elif server.backend.engine == "midonet" %}
-service_plugins = lbaas
+{%- elif pillar.neutron.server.tunnel_type != 'flat' %}
+service_plugins = router
 {%- endif %}
 
 # Paste configuration file
@@ -623,20 +630,20 @@ quota_driver = neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDr
 {%- endif %}
 
 # Resource name(s) that are supported in quota features
-# quota_items = network,subnet,port
+quota_items = network,subnet,port
 
 # Default number of resource allowed per tenant. A negative value means
 # unlimited.
 # default_quota = -1
 
 # Number of networks allowed per tenant. A negative value means unlimited.
-# quota_network = 10
+quota_network = 5
 
 # Number of subnets allowed per tenant. A negative value means unlimited.
-# quota_subnet = 10
+quota_subnet = 5
 
 # Number of ports allowed per tenant. A negative value means unlimited.
-# quota_port = 50
+quota_port = 20
 
 # Number of security groups allowed per tenant. A negative value means
 # unlimited.
@@ -676,10 +683,10 @@ quota_driver = neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDr
 # quota_healthmonitor = -1
 
 # Number of routers allowed per tenant. A negative value means unlimited.
-# quota_router = 10
+quota_router = 5
 
 # Number of floating IPs allowed per tenant. A negative value means unlimited.
-# quota_floatingip = 50
+quota_floatingip = 1
 
 # Number of firewalls allowed per tenant. A negative value means unlimited.
 # quota_firewall = 1
@@ -727,8 +734,6 @@ root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 # ===========  end of items for agent management extension =====
 
 [keystone_authtoken]
-
-identity_uri = http://{{ neutron.identity.host }}:5000
 auth_host = {{ neutron.identity.host }}
 auth_port = {{ neutron.identity.port }}
 auth_protocol = http
@@ -736,8 +741,8 @@ admin_tenant_name = {{ neutron.identity.tenant }}
 admin_user = {{ neutron.identity.user }}
 admin_password = {{ neutron.identity.password }}
 auth_uri=http://{{ neutron.identity.host }}:5000
-auth_url=http://{{ neutron.identity.host }}:35357
 auth_region={{ neutron.identity.region }}
+signing_dir = $state_path/keystone-signing
 
 [database]
 # This line MUST be changed to actually run the plugin.
@@ -745,7 +750,7 @@ auth_region={{ neutron.identity.region }}
 
 {%- if server.backend.engine == "contrail" %}
 connection = sqlite:////var/lib/neutron/neutron.sqlite
-{%- elif server.backend.engine == "midonet" %}
+{%- else %}
 connection = {{ server.database.engine }}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}
 {%- endif %}
 
@@ -1036,10 +1041,6 @@ rabbit_max_retries = 0
 # Deprecated, use rpc_backend=kombu+memory or rpc_backend=fake (boolean value)
 # Deprecated group/name - [DEFAULT]/fake_rabbit
 # fake_rabbit = false
-[QUOTAS]
-quota_network = -1
-quota_subnet = -1
-quota_port = -1
 
 [NOVA]
 {%- if server.backend.engine == "contrail" %}

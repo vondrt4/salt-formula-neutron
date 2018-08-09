@@ -1,5 +1,5 @@
-{%- if pillar.neutron.network is defined %}
-{%- set neutron = pillar.neutron.network %}
+{%- if pillar.neutron.gateway is defined %}
+{%- set neutron = pillar.neutron.gateway %}
 {%- elif pillar.neutron.compute is defined %}
 {%- set neutron = pillar.neutron.compute %}
 {%- elif pillar.neutron.server is defined %}

@@ -2,8 +2,8 @@
 {%- set neutron = pillar.neutron.server %}
 {%- elif pillar.neutron.compute is defined %}
 {%- set neutron = pillar.neutron.compute %}
-{%- elif pillar.neutron.network is defined %}
-{%- set neutron = pillar.neutron.network %}
+{%- elif pillar.neutron.gateway is defined %}
+{%- set neutron = pillar.neutron.gateway %}
 {%- endif %}
 [DEFAULT]
 debug = False
@@ -25,8 +25,8 @@ metadata_port=8775
 
 ovs_use_veth = false
 
-{%- if neutron.distributed %}
-{%- if pillar.neutron.network is defined %}
+{%- if neutron.dvr %}
+{%- if pillar.neutron.gateway is defined %}
 agent_mode = dvr_snat
 {%- elif pillar.neutron.compute is defined %}
 agent_mode = dvr

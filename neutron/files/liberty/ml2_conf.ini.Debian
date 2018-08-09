@@ -3,7 +3,7 @@
 {%- if neutron.tunnel_type == 'gre' or neutron.tunnel_type == 'vxlan' %}
 type_drivers = flat,vlan,gre,vxlan
 tenant_network_types = {{ neutron.tunnel_type }}
-mechanism_drivers = openvswitch{%- if neutron.distributed %},l2population{%- endif %}
+mechanism_drivers = openvswitch{%- if neutron.dvr %},l2population{%- endif %}
 
 [ml2_type_flat]
 #flat_networks = external
@@ -23,7 +23,7 @@ enable_security_group = True
 enable_ipset = True
 
 [ovs]
-local_ip = {{ pillar.neutron.network.bind.address }}
+local_ip = {{ pillar.neutron.gateway.bind.address }}
 tenant_network_type = {{ neutron.tunnel_type }}
 tunnel_id_ranges = {%- if neutron.tunnel_type == 'gre' %} 32769:34000 {%- else %} 65537:69999 {%- endif %}
 enable_tunneling = True

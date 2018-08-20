@@ -34,6 +34,10 @@ bridge_mappings = external:br-ex
 [agent]
 tunnel_types = {{ neutron.tunnel_type }}
 root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
+{%- if neutron.dvr %}
+l2_population = True
+enable_distributed_routing = True
+{%- endif %}
 
 [database]
 connection = {{ pillar.neutron.server.database.engine }}://{{ pillar.neutron.server.database.user }}:{{ pillar.neutron.server.database.password }}@{{ pillar.neutron.server.database.host }}/{{ pillar.neutron.server.database.name }}

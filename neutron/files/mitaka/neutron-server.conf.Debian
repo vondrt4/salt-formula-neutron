@@ -126,7 +126,6 @@ pagination_max_limit = {{ server.pagination_max_limit|default('-1') }}
 # lease times. (integer value)
 # Deprecated group/name - [DEFAULT]/dhcp_lease_time
 #dhcp_lease_duration = 86400
-dhcp_lease_duration = 600
 
 # Domain to use for building the hostnames (string value)
 #dns_domain = openstacklocal
@@ -259,7 +258,6 @@ global_physnet_mtu = {{ server.get('global_physnet_mtu', '1500') }}
 # Seconds to regard the agent is down; should be at least twice
 # report_interval, to be sure the agent is down for good. (integer value)
 #agent_down_time = 75
-agent_down_time = 30
 
 # Representing the resource type whose load is being reported by the agent.
 # This can be "networks", "subnets" or "ports". When specified (Default is
@@ -537,11 +535,9 @@ rpc_cast_timeout=30
 # Size of executor thread pool. (integer value)
 # Deprecated group/name - [DEFAULT]/rpc_thread_pool_size
 #executor_thread_pool_size = 64
-executor_thread_pool_size = 70
 
 # Seconds to wait for a response from a call. (integer value)
 #rpc_response_timeout = 60
-rpc_response_timeout=60
 
 # A URL representing the messaging driver to use and its full configuration. If
 # not set, we fall back to the rpc_backend option and driver specific
@@ -551,7 +547,6 @@ rpc_response_timeout=60
 # The messaging driver to use, defaults to rabbit. Other drivers include amqp
 # and zmq. (string value)
 #rpc_backend = rabbit
-rpc_backend = rabbit
 
 # The default exchange under which topics are scoped. May be overridden by an
 # exchange name specified in the transport_url option. (string value)
@@ -615,7 +610,6 @@ root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 # agent_down_time, best if it is half or less than agent_down_time. (floating
 # point value)
 #report_interval = 30
-report_interval = 10
 
 # Log agent heartbeats (boolean value)
 #log_agent_heartbeats = false
@@ -1396,13 +1390,11 @@ rabbit_virtual_host = {{ server.message_queue.virtual_host }}
 
 # How frequently to retry connecting with RabbitMQ. (integer value)
 #rabbit_retry_interval = 1
-rabbit_retry_interval = 1
 
 # How long to backoff for between retries when connecting to RabbitMQ. (integer
 # value)
 # Deprecated group/name - [DEFAULT]/rabbit_retry_backoff
 #rabbit_retry_backoff = 2
-rabbit_retry_backoff = 2
 
 # Maximum interval of RabbitMQ connection retries. Default is 30 seconds.
 # (integer value)
@@ -1412,7 +1404,6 @@ rabbit_retry_backoff = 2
 # count). (integer value)
 # Deprecated group/name - [DEFAULT]/rabbit_max_retries
 #rabbit_max_retries = 0
-rabbit_max_retries = 0
 
 # Try to use HA queues in RabbitMQ (x-ha-policy: all). If you change this
 # option, you must wipe the RabbitMQ database. In RabbitMQ 3.0, queue mirroring
@@ -1442,7 +1433,6 @@ heartbeat_timeout_threshold = 0
 # How often times during the heartbeat_timeout_threshold we check the
 # heartbeat. (integer value)
 #heartbeat_rate = 2
-heartbeat_rate = 2
 
 # Deprecated, use rpc_backend=kombu+memory or rpc_backend=fake (boolean value)
 # Deprecated group/name - [DEFAULT]/fake_rabbit
@@ -1580,7 +1570,7 @@ heartbeat_rate = 2
 # deprecated for removal. (list value)
 # This option is deprecated for removal.
 # Its value may be silently ignored in the future.
-#quota_items = network,subnet,port
+quota_items = network,subnet,port,router,floatingip
 
 # Default number of resource allowed per tenant. A negative value means
 # unlimited. (integer value)
@@ -1589,14 +1579,17 @@ heartbeat_rate = 2
 # Number of networks allowed per tenant. A negative value means unlimited.
 # (integer value)
 #quota_network = 10
+quota_network = 5
 
 # Number of subnets allowed per tenant, A negative value means unlimited.
 # (integer value)
 #quota_subnet = 10
+quota_subnet = 5
 
 # Number of ports allowed per tenant. A negative value means unlimited.
 # (integer value)
 #quota_port = 50
+quota_port = 20
 
 # Default driver to use for quota checks (string value)
 #quota_driver = neutron.db.quota.driver.DbQuotaDriver
@@ -1616,10 +1609,12 @@ quota_driver = neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDr
 # Number of routers allowed per tenant. A negative value means unlimited.
 # (integer value)
 #quota_router = 10
+quota_router = 5
 
 # Number of floating IPs allowed per tenant. A negative value means unlimited.
 # (integer value)
 #quota_floatingip = 50
+quota_floatingip = 1
 
 # Number of security groups allowed per tenant. A negative value means
 # unlimited. (integer value)

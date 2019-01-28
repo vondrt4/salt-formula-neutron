@@ -1622,7 +1622,7 @@ quota_floatingip = 1
 
 # Number of security rules allowed per tenant. A negative value means
 # unlimited. (integer value)
-#quota_security_group_rule = 100
+quota_security_group_rule = 200
 
 
 [ssl]

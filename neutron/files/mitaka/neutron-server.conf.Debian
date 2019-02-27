@@ -1669,6 +1669,24 @@ password={{ lbaas.controller_password }}
 cloud={{ lbaas.controller_cloud_name }}
 {%- endif -%}
 
+{%- if lbaas.engine == "octavia" -%}
+service_provider=LOADBALANCERV2:{{ lbaas_name }}:{{ lbaas.get('driver_path', 'neutron_lbaas.drivers.octavia.driver.OctaviaDriver') }}:default
+
+[octavia]
+base_url = http://{{ server.identity.host }}:9876
+
+[service_auth]
+auth_url = http://{{ server.loadbalancer.host }}:5000/v3
+admin_user = octavia
+admin_tenant_name = service
+admin_password = {{ server.loadbalancer.password }}
+admin_user_domain = default
+admin_project_domain = default
+region = RegionOne
+auth_version = 3
+endpoint_type = internalURL
+{%- endif -%}
+
 {%- endfor -%}
 
 {% endif %}

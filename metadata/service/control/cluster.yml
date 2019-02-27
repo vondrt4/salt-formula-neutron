@@ -43,3 +43,6 @@ parameters:
         user: nova
         password: ${_param:keystone_nova_password}
         tenant: service
+      loadbalancer:
+        host: ${_param:cluster_vip_address}
+        password: ${_param:keystone_octavia_password}

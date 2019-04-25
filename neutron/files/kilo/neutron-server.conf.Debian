@@ -8,6 +8,8 @@ notification_driver = neutron.openstack.common.notifier.rpc_notifier
 allow_overlapping_ips = True
 allow_automatic_l3agent_failover = True
 
+api_workers = 2
+
 {%- if pillar.neutron.server.distributed %}
 router_distributed = True
 {%- endif %}

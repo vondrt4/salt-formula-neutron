@@ -212,7 +212,7 @@ global_physnet_mtu = {{ server.get('global_physnet_mtu', '1500') }}
 # Number of separate API worker processes for service. If not specified, the
 # default is equal to the number of CPUs available for best performance.
 # (integer value)
-#api_workers = <None>
+api_workers = 2
 
 # Number of RPC worker processes for service (integer value)
 #rpc_workers = 1
@@ -329,7 +329,7 @@ router_scheduler_driver = neutron.scheduler.l3_agent_scheduler.ChanceScheduler
 
 # Automatically reschedule routers from offline L3 agents to online L3 agents.
 # (boolean value)
-#allow_automatic_l3agent_failover = false
+allow_automatic_l3agent_failover = True
 
 # Enable HA mode for virtual routers. (boolean value)
 #l3_ha = false
